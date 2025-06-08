@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Orders - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Manage Orders</h2>
+    
+    {% if orders %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><code>{{ order.id[:8] }}</code></td>
+                        <td>
+                            Customer #{{ order.user }}
+                            <br>
+                            <small class="text-muted">{{ order.shipping_address.firstName }} {{ order.shipping_address.lastName }}</small>
+                        </td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ order.items|length }} items</td>
+                        <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                        <td>
+                            <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'completed' %}success{% elif order.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                                {{ order.status.title() }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderModal{{ loop.index }}">
+                                    <i data-feather="eye" size="14"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-success">
+                                    <i data-feather="check" size="14"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Order Detail Modals -->
+        {% for order in orders %}
+        <div class="modal fade" id="orderModal{{ loop.index }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Order #{{ order.id[:8] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6>Order Items:</h6>
+                                {% for item in order.items %}
+                                <div class="d-flex justify-content-between border-bottom py-2">
+                                    <div>
+                                        <strong>{{ item.name }}</strong>
+                                        <br>
+                                        <small>Qty: {{ item.quantity }} × ${{ "%.2f"|format(item.price) }}</small>
+                                    </div>
+                                    <span>${{ "%.2f"|format(item.subtotal) }}</span>
+                                </div>
+                                {% endfor %}
+                                <div class="d-flex justify-content-between mt-2">
+                                    <strong>Total: ${{ "%.2f"|format(order.total_amount) }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Shipping Address:</h6>
+                                <address>
+                                    {{ order.shipping_address.firstName }} {{ order.shipping_address.lastName }}<br>
+                                    {{ order.shipping_address.addressLine1 }}<br>
+                                    {% if order.shipping_address.addressLine2 %}{{ order.shipping_address.addressLine2 }}<br>{% endif %}
+                                    {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.postalCode }}<br>
+                                    {{ order.shipping_address.country }}
+                                </address>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5">
+            <i data-feather="shopping-bag" size="64" class="text-muted mb-3"></i>
+            <h3>No orders yet</h3>
+            <p class="text-muted">Orders will appear here when customers make purchases.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

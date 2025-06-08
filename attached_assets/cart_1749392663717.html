@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Deli Spi</title>
+    <meta name="description" content="View and manage your shopping cart at Deli Spi.">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Basic reset and styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header styles */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo img {
+            height: 40px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .nav-icons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .nav-icons a {
+            color: #333;
+            font-size: 18px;
+            position: relative;
+        }
+        
+        .cart-icon.active {
+            color: #e67e22;
+        }
+        
+        .mobile-menu {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        /* Cart section styles */
+        .cart-section {
+            padding: 40px 0;
+        }
+        
+        .cart-section h1 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .cart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .cart-items {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 2fr 1fr 1fr 50px;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item-image img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .item-details h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .item-variant {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .current-price {
+            font-weight: 600;
+            color: #e67e22;
+        }
+        
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+        
+        .item-quantity {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            background-color: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .item-quantity input {
+            width: 40px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid #ddd;
+            margin: 0 5px;
+        }
+        
+        .item-total {
+            font-weight: 600;
+        }
+        
+        .remove-item {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .remove-item:hover {
+            color: #e74c3c;
+        }
+        
+        .coupon-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+        }
+        
+        .coupon-section h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .coupon-form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .coupon-form input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .apply-coupon {
+            padding: 0 15px;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .continue-shopping {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 15px;
+        }
+        
+        .continue-shopping img {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Recommended products */
+        .recommended-products {
+            margin-top: 40px;
+        }
+        
+        .recommended-products h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .product-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        /* Cart summary */
+        .cart-summary {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            align-self: flex-start;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .cart-summary h2 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .summary-item.total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .payment-methods {
+            margin-top: 20px;
+        }
+        
+        .payment-methods img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Empty cart */
+        .cart-empty {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .cart-empty i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .cart-empty h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        /* WhatsApp chat */
+        .whatsapp-chat {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 99;
+        }
+        
+        .whatsapp-chat img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .footer-section p, .footer-section a {
+            color: #bbb;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            font-size: 1.2rem;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .cart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cart-item {
+                grid-template-columns: 80px 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 10px;
+            }
+            
+            .item-details {
+                grid-column: 2;
+                grid-row: 1;
+            }
+            
+            .item-quantity {
+                grid-column: 1 / span 2;
+                grid-row: 2;
+                justify-content: flex-start;
+            }
+            
+            .item-total {
+                grid-column: 1;
+                grid-row: 3;
+            }
+            
+            .remove-item {
+                grid-column: 2;
+                grid-row: 3;
+                justify-self: end;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <a href="index.html"><img src="images/logo.png" alt="Deli Spi Logo"></a>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="about.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="nav-icons">
+                    <a href="#" class="wishlist-icon"><i class="fas fa-heart"></i></a>
+                    <a href="cart.html" class="cart-icon active"><i class="fas fa-shopping-cart"></i><span class="cart-count">0</span></a>
+                    <button class="mobile-menu"><i class="fas fa-bars"></i></button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Cart Section -->
+    <section class="cart-section">
+        <div class="container">
+            <h1>Shopping Cart</h1>
+            
+            <div class="cart-grid">
+                <!-- Cart Items -->
+                <div class="cart-items">
+                    <!-- Example Cart Item -->
+                    <div class="cart-item">
+                        <div class="item-image">
+                            <img src="images/spices/turmeric.jpg" alt="Organic Turmeric Powder">
+                        </div>
+                        <div class="item-details">
+                            <h3>Organic Turmeric Powder</h3>
+                            <div class="item-variant">Size: 250g</div>
+                            <div class="item-price">
+                                <span class="current-price">₹249</span>
+                                <span class="original-price">₹299</span>
+                            </div>
+                        </div>
+                        <div class="item-quantity">
+                            <button class="quantity-btn minus">-</button>
+                            <input type="number" value="1" min="1" max="10">
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                        <div class="item-total">₹249</div>
+                        <button class="remove-item"><i class="fas fa-times"></i></button>
+                    </div>
+
+                    <!-- Example Cart Item -->
+                    <div class="cart-item">
+                        <div class="item-image">
+                            <img src="images/spices/cinnamon.jpg" alt="Ceylon Cinnamon Sticks">
+                        </div>
+                        <div class="item-details">
+                            <h3>Ceylon Cinnamon Sticks</h3>
+                            <div class="item-variant">Size: 100g</div>
+                            <div class="item-price">
+                                <span class="current-price">₹399</span>
+                            </div>
+                        </div>
+                        <div class="item-quantity">
+                            <button class="quantity-btn minus">-</button>
+                            <input type="number" value="1" min="1" max="10">
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                        <div class="item-total">₹399</div>
+                        <button class="remove-item"><i class="fas fa-times"></i></button>
+                    </div>
+                    
+                    <!-- More cart items will be added dynamically -->
+                </div>
+
+                <div class="coupon-section">
+                    <h3>Have a coupon code?</h3>
+                    <form class="coupon-form">
+                        <input type="text" placeholder="Enter coupon code">
+                        <button type="submit" class="apply-coupon btn">Apply</button>
+                    </form>
+                </div>
+                
+                <a href="products.html" class="continue-shopping"><img src="images/icons/arrow-left.svg" alt="Continue Shopping"> Continue Shopping</a>
+
+            </div>
+            <div class="cart-summary">
+                <h2>Order Summary</h2>
+                <div class="summary-details">
+                    <div class="detail-row">
+                        <span>Subtotal:</span>
+                        <span class="subtotal">₹648</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Shipping:</span>
+                        <span class="shipping">₹0</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Discount:</span>
+                        <span class="discount">-₹0</span>
+                    </div>
+                    <div class="detail-row total">
+                        <span>Total:</span>
+                        <span class="total">₹648</span>
+                    </div>
+                </div>
+                <button class="checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+
+        <!-- Recommended products -->
+        <section class="recommended-products">
+            <h2>You May Also Like</h2>
+            <div class="products-grid">
+                <!-- Recommended Product Card -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="images/spices/turmeric.jpg" alt="Organic Turmeric Powder">
+                        <div class="product-actions">
+                            <button class="quick-view"><img src="images/icons/search.svg" alt="Quick View"></button>
+                            <button class="add-to-wishlist"><img src="images/icons/star.svg" alt="Add to Wishlist"></button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Organic Turmeric Powder</h3>
+                        <div class="product-price">
+                            <span class="current-price">₹249</span>
+                            <span class="original-price">₹299</span>
+                        </div>
+                        <button class="add-to-cart">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Recommended Product Card -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="images/spices/cinnamon.jpg" alt="Ceylon Cinnamon Sticks">
+                        <div class="product-actions">
+                            <button class="quick-view"><img src="images/icons/search.svg" alt="Quick View"></button>
+                            <button class="add-to-wishlist"><img src="images/icons/star.svg" alt="Add to Wishlist"></button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Ceylon Cinnamon Sticks</h3>
+                        <div class="product-price">
+                            <span class="current-price">₹399</span>
+                        </div>
+                        <button class="add-to-cart">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Recommended Product Card -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="images/spices/cardamom.jpg" alt="Green Cardamom Pods">
+                        <div class="product-actions">
+                            <button class="quick-view"><img src="images/icons/search.svg" alt="Quick View"></button>
+                            <button class="add-to-wishlist"><img src="images/icons/star.svg" alt="Add to Wishlist"></button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Green Cardamom Pods</h3>
+                        <div class="product-price">
+                            <span class="current-price">₹499</span>
+                            <span class="original-price">₹599</span>
+                        </div>
+                        <button class="add-to-cart">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- WhatsApp Chat -->
+    <a href="https://wa.me/919876543210" class="whatsapp-chat" target="_blank" aria-label="Chat with us on WhatsApp">
+        <img src="images/icons/whatsapp.svg" alt="Chat on WhatsApp">
+    </a>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>Email: info@delispi.com</p>
+                    <p>Phone: +91 123 456 7890</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="products.html">Products</a>
+                    <a href="about.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><img src="images/icons/facebook.svg" alt="Facebook"></a>
+                        <a href="#" aria-label="Instagram"><img src="images/icons/instagram.svg" alt="Instagram"></a>
+                        <a href="#" aria-label="Twitter"><img src="images/icons/twitter.svg" alt="Twitter"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Deli Spi. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartItemsContainer = document.querySelector('.cart-items');
+            const cartSummary = document.querySelector('.cart-summary');
+            
+            function updateCartDisplay() {
+                const items = cart.getItems();
+                
+                if (items.length === 0) {
+                    cartItemsContainer.innerHTML = `
+                        <div class="cart-empty">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h2>Your cart is empty</h2>
+                            <p>Looks like you haven't added any items to your cart yet.</p>
+                            <a href="products.html" class="btn btn-primary">Start Shopping</a>
+                        </div>
+                    `;
+                    cartSummary.style.display = 'none';
+                    return;
+                }
+                
+                let cartHTML = '';
+                let subtotal = 0;
+                
+                items.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    subtotal += itemTotal;
+                    
+                    cartHTML += `
+                        <div class="cart-item" data-id="${item.id}">
+                            <div class="item-image">
+                                <img src="${item.image}" alt="${item.name}">
+                            </div>
+                            <div class="item-details">
+                                <h3>${item.name}</h3>
+                                <div class="item-price">
+                                    <span class="current-price">₹${item.price}</span>
+                                </div>
+                            </div>
+                            <div class="item-quantity">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" value="${item.quantity}" min="1" max="10">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <div class="item-total">₹${itemTotal}</div>
+                            <button class="remove-item"><i class="fas fa-times"></i></button>
+                        </div>
+                    `;
+                });
+                
+                cartItemsContainer.innerHTML = cartHTML;
+                cartSummary.style.display = 'block';
+                
+                // Update summary
+                document.querySelector('.subtotal').textContent = `₹${subtotal}`;
+                document.querySelector('.total').textContent = `₹${subtotal}`;
+                
+                // Add event listeners for quantity buttons
+                const minusButtons = document.querySelectorAll('.minus');
+                const plusButtons = document.querySelectorAll('.plus');
+                const removeButtons = document.querySelectorAll('.remove-item');
+                
+                minusButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const input = this.nextElementSibling;
+                        const newQuantity = parseInt(input.value) - 1;
+                        const itemId = this.closest('.cart-item').dataset.id;
+                        cart.updateQuantity(itemId, newQuantity);
+                        updateCartDisplay();
+                    });
+                });
+                
+                plusButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const input = this.previousElementSibling;
+                        const newQuantity = parseInt(input.value) + 1;
+                        const itemId = this.closest('.cart-item').dataset.id;
+                        cart.updateQuantity(itemId, newQuantity);
+                        updateCartDisplay();
+                    });
+                });
+                
+                removeButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemId = this.closest('.cart-item').dataset.id;
+                        cart.removeItem(itemId);
+                        updateCartDisplay();
+                    });
+                });
+
+                // Add event delegation for remove buttons
+                cartItemsContainer.addEventListener('click', function(event) {
+                    if (event.target.classList.contains('remove-item') || event.target.closest('.remove-item')) {
+                        const removeButton = event.target.closest('.remove-item');
+                        const itemId = removeButton.closest('.cart-item').dataset.id;
+                        cart.removeItem(itemId);
+                        updateCartDisplay();
+                    }
+                });
+            }
+            
+            // Initial cart display
+            updateCartDisplay();
+            
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu');
+            const navLinks = document.querySelector('.nav-links');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

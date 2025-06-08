@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}My Addresses - Deli Spi{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Addresses</h2>
+        <a href="{{ url_for('main.new_address') }}" class="btn btn-primary">
+            <i data-feather="plus" size="16"></i> Add New Address
+        </a>
+    </div>
+    
+    {% if addresses %}
+        <div class="row">
+            {% for address in addresses %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100{% if address.is_default %} border-primary{% endif %}">
+                    {% if address.is_default %}
+                    <div class="card-header bg-primary text-white">
+                        <small><i data-feather="star" size="14"></i> Default Address</small>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h6>{{ address.first_name }} {{ address.last_name }}</h6>
+                        <address class="mb-3">
+                            {{ address.address_line1 }}<br>
+                            {% if address.address_line2 %}{{ address.address_line2 }}<br>{% endif %}
+                            {{ address.city }}, {{ address.state }} {{ address.postal_code }}<br>
+                            {{ address.country }}
+                        </address>
+                        
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary">Edit</button>
+                            <button type="button" class="btn btn-outline-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i data-feather="map-pin" size="64" class="text-muted mb-3"></i>
+            <h3>No addresses saved</h3>
+            <p class="text-muted">Add your first address to make checkout faster.</p>
+            <a href="{{ url_for('main.new_address') }}" class="btn btn-primary">Add Address</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

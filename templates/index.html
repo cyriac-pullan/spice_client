@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Premium Spices & Herbs</h1>
+                <p class="lead mb-4">Discover authentic flavors from around the world. Quality ingredients for exceptional culinary experiences.</p>
+                <a href="{{ url_for('products.products') }}" class="btn btn-light btn-lg">Shop Now</a>
+            </div>
+            <div class="col-lg-6 text-center">
+                <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="150" cy="100" r="80" fill="currentColor" opacity="0.2"/>
+                    <circle cx="150" cy="100" r="60" fill="currentColor" opacity="0.4"/>
+                    <circle cx="150" cy="100" r="40" fill="currentColor" opacity="0.6"/>
+                    <circle cx="150" cy="100" r="20" fill="currentColor"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Shop by Category</h2>
+        <div class="row">
+            {% for category in categories %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i data-feather="{% if 'spice' in category.name.lower() %}star{% elif 'herb' in category.name.lower() %}leaf{% else %}package{% endif %}" size="48" class="text-primary"></i>
+                        </div>
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text">{{ category.description }}</p>
+                        <a href="{{ url_for('products.products', category=category.id) }}" class="btn btn-outline-primary">Browse {{ category.name }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Featured Products</h2>
+        <div class="row">
+            {% for product in featured_products %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary" style="height: 200px;">
+                        <i data-feather="image" size="48" class="text-muted"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted">{{ product.description[:50] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 text-primary mb-0">${{ "%.2f"|format(product.price) }}</span>
+                            <span class="badge bg-success">In Stock</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="{{ url_for('products.product_detail', product_id=product.id) }}" class="btn btn-primary w-100">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('products.products') }}" class="btn btn-outline-primary btn-lg">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose Deli Spi?</h2>
+        <div class="row">
+            <div class="col-md-4 text-center mb-4">
+                <div class="mb-3">
+                    <i data-feather="award" size="48" class="text-primary"></i>
+                </div>
+                <h4>Premium Quality</h4>
+                <p>We source only the finest spices and herbs from trusted suppliers worldwide.</p>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="mb-3">
+                    <i data-feather="truck" size="48" class="text-primary"></i>
+                </div>
+                <h4>Fast Shipping</h4>
+                <p>Quick and reliable delivery to ensure your spices arrive fresh and ready to use.</p>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="mb-3">
+                    <i data-feather="heart" size="48" class="text-primary"></i>
+                </div>
+                <h4>Customer Satisfaction</h4>
+                <p>Your satisfaction is our priority. We're here to help with any questions or concerns.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

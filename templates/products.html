@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Products - Deli Spi{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Search -->
+                    <form method="GET" class="mb-3">
+                        <label for="search" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="search" name="search" value="{{ search_query or '' }}" placeholder="Search products...">
+                        <button type="submit" class="btn btn-primary btn-sm mt-2">Search</button>
+                        {% if search_query or selected_category %}
+                        <a href="{{ url_for('products.products') }}" class="btn btn-outline-secondary btn-sm mt-2">Clear</a>
+                        {% endif %}
+                    </form>
+                    
+                    <!-- Categories -->
+                    <h6>Categories</h6>
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('products.products') }}" class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
+                            All Categories
+                        </a>
+                        {% for category in categories %}
+                        <a href="{{ url_for('products.products', category=category.id) }}" class="list-group-item list-group-item-action {% if selected_category == category.id %}active{% endif %}">
+                            {{ category.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Products -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Products</h2>
+                <small class="text-muted">{{ products|length }} products found</small>
+            </div>
+            
+            {% if products %}
+            <div class="row">
+                {% for product in products %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary" style="height: 200px;">
+                            <i data-feather="image" size="48" class="text-muted"></i>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted">{{ product.description[:80] }}...</p>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="h5 text-primary mb-0">${{ "%.2f"|format(product.price) }}</span>
+                                {% if product.stock_quantity > 0 %}
+                                <span class="badge bg-success">In Stock ({{ product.stock_quantity }})</span>
+                                {% else %}
+                                <span class="badge bg-danger">Out of Stock</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">SKU: {{ product.sku }}</small>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('products.product_detail', product_id=product.id) }}" class="btn btn-primary">View Details</a>
+                                {% if product.stock_quantity > 0 %}
+                                <form method="POST" action="{{ url_for('products.add_to_cart_route') }}" class="d-inline">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-outline-primary w-100">
+                                        <i data-feather="shopping-cart" size="16"></i> Add to Cart
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i data-feather="search" size="64" class="text-muted mb-3"></i>
+                <h3>No products found</h3>
+                <p class="text-muted">Try adjusting your search or browse different categories.</p>
+                <a href="{{ url_for('products.products') }}" class="btn btn-primary">View All Products</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

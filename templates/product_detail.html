@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Deli Spi{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products.products') }}">Products</a></li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary" style="height: 400px;">
+                    <i data-feather="image" size="120" class="text-muted"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="lead text-muted mb-4">{{ product.description }}</p>
+            
+            <div class="mb-4">
+                <span class="h2 text-primary">${{ "%.2f"|format(product.price) }}</span>
+                <span class="ms-3">
+                    {% if product.stock_quantity > 0 %}
+                    <span class="badge bg-success fs-6">In Stock ({{ product.stock_quantity }})</span>
+                    {% else %}
+                    <span class="badge bg-danger fs-6">Out of Stock</span>
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="mb-4">
+                <small class="text-muted">SKU: {{ product.sku }}</small>
+            </div>
+            
+            {% if product.stock_quantity > 0 %}
+            <form method="POST" action="{{ url_for('products.add_to_cart_route') }}" class="mb-4">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-auto">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <select class="form-select" id="quantity" name="quantity" style="width: 80px;">
+                            {% for i in range(1, [product.stock_quantity + 1, 11] | min) %}
+                            <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i data-feather="shopping-cart" size="20"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+            
+            {% if current_user.is_authenticated %}
+            <div class="mb-4">
+                {% if product.id not in (current_user.wishlist | map('string') | list) %}
+                <a href="{{ url_for('products.add_to_wishlist', product_id=product.id) }}" class="btn btn-outline-secondary">
+                    <i data-feather="heart" size="16"></i> Add to Wishlist
+                </a>
+                {% else %}
+                <a href="{{ url_for('products.remove_from_wishlist', product_id=product.id) }}" class="btn btn-secondary">
+                    <i data-feather="heart" fill="currentColor" size="16"></i> Remove from Wishlist
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="border-top pt-4">
+                <h5>Product Information</h5>
+                <ul class="list-unstyled">
+                    <li><strong>Category:</strong> Spices & Herbs</li>
+                    <li><strong>Origin:</strong> Premium sourced</li>
+                    <li><strong>Storage:</strong> Store in a cool, dry place</li>
+                    <li><strong>Shelf Life:</strong> 2-3 years from production date</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="mt-5">
+        <h3 class="mb-4">Related Products</h3>
+        <div class="row">
+            {% for related_product in related_products %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary" style="height: 150px;">
+                        <i data-feather="image" size="32" class="text-muted"></i>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title">{{ related_product.name }}</h6>
+                        <p class="card-text text-muted small">{{ related_product.description[:50] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary">${{ "%.2f"|format(related_product.price) }}</span>
+                            <a href="{{ url_for('products.product_detail', product_id=related_product.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

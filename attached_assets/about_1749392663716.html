@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Deli Spi</title>
+    <meta name="description" content="Learn about Deli Spi's journey, our commitment to quality, and our mission to bring you the finest spices.">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #e67e22;
+            --secondary-color: #d35400;
+            --dark-color: #333;
+            --light-color: #f9f9f9;
+            --text-color: #555;
+            --white: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: var(--light-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        h1, h2, h3, h4 {
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo img {
+            height: 40px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-icons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .nav-icons a {
+            color: var(--dark-color);
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-icons a:hover {
+            color: var(--primary-color);
+        }
+        
+        .mobile-menu {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+        
+        /* Hero Section */
+        .about-hero {
+            height: 400px;
+            background-image: url('/images/about-banner.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+        }
+        
+        .about-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .about-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+        
+        .about-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* About Content */
+        .about-content {
+            padding: 80px 0;
+        }
+        
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .about-text h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .about-text h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .about-image {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Mission & Values */
+        .mission-values {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+        
+        .mission-values h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .mission-values h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .value-card {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: var(--light-color);
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .value-card i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .value-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        /* Our Process */
+        .our-process {
+            padding: 80px 0;
+        }
+        
+        .our-process h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .our-process h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .process-step {
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 auto 20px;
+        }
+        
+        .process-step h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        /* Team Section */
+        .team-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+        
+        .team-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .team-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .team-member {
+            text-align: center;
+        }
+        
+        .team-member img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 5px solid var(--light-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .team-member h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .team-member p {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* Certifications */
+        .certifications {
+            padding: 80px 0;
+        }
+        
+        .certifications h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .certifications h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .cert-item {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .cert-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin: 0 auto 20px;
+        }
+        
+        .cert-item h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+        
+        .testimonials h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .testimonials h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .testimonials-slider {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .testimonial {
+            background-color: var(--light-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .testimonial-content p {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .testimonial-content p::before,
+        .testimonial-content p::after {
+            content: '"';
+            font-size: 2rem;
+            color: var(--primary-color);
+            opacity: 0.3;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .testimonial-author img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .author-info h4 {
+            margin-bottom: 5px;
+            text-align: left;
+        }
+        
+        .author-info p {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/images/spices-background.jpg') no-repeat center center/cover;
+            color: var(--white);
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        /* WhatsApp Chat */
+        .whatsapp-chat {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 99;
+        }
+        
+        .whatsapp-chat img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .whatsapp-chat img:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: var(--white);
+            padding: 60px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+        
+        .footer-section p, .footer-section a {
+            color: #bbb;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            font-size: 1.2rem;
+            color: #bbb;
+            transition: color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-image {
+                order: -1;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--white);
+                padding: 20px;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cta-section h2 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .about-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .about-hero p {
+                font-size: 1rem;
+            }
+            
+            .cta-section h2 {
+                font-size: 1.8rem;
+            }
+            
+            .cta-section p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="/images/logo.png" alt="Deli Spi Logo">
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="about.html" class="active">About Us</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="nav-icons">
+                    <a href="#" class="wishlist-icon"><i class="fas fa-heart"></i></a>
+                    <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
+                    <button class="mobile-menu"><i class="fas fa-bars"></i></button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="about-hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/about-hero.jpg');">
+        <div class="container">
+            <h1>Our Story</h1>
+            <p>Bringing the world's finest spices to your kitchen since 2010</p>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="about-content">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text">
+                    <h2>Our Story</h2>
+                    <p>Deli Spi was founded with a passion for authentic and high-quality spices. Our journey began with a simple idea: to bring the rich flavors and aromas of the world's best spices directly to your kitchen. We work closely with farmers who follow sustainable and ethical practices, ensuring that every spice we offer is of the highest standard.</p>
+                    <p>We believe that spices are not just ingredients; they are the soul of every dish, telling a story of tradition, culture, and flavor. Our mission is to empower home cooks and professional chefs alike with the finest spices that inspire culinary creativity and elevate everyday meals to extraordinary experiences.</p>
+                </div>
+                <div class="about-image">
+                    <img src="/images/processing-facility.jpg" alt="Our Processing Facility">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Values -->
+    <section class="mission-values">
+        <div class="container">
+            <h2>Our Mission & Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <img src="/images/icons/check.svg" alt="Quality Icon" style="width: 40px; height: 40px;">
+                    <h3>Quality</h3>
+                    <p>We are committed to sourcing and delivering only the highest quality, authentic spices.</p>
+                </div>
+                <div class="value-card">
+                    <img src="/images/icons/check.svg" alt="Sustainability Icon" style="width: 40px; height: 40px;">
+                    <h3>Sustainability</h3>
+                    <p>We support sustainable farming practices and work with farmers who care for the environment.</p>
+                </div>
+                <div class="value-card">
+                    <img src="/images/icons/check.svg" alt="Integrity Icon" style="width: 40px; height: 40px;">
+                    <h3>Integrity</h3>
+                    <p>We believe in transparency and honesty in all our dealings, from sourcing to selling.</p>
+                </div>
+                <div class="value-card">
+                    <img src="/images/icons/check.svg" alt="Customer Satisfaction Icon" style="width: 40px; height: 40px;">
+                    <h3>Customer Satisfaction</h3>
+                    <p>Your satisfaction is our top priority. We strive to exceed your expectations with every order.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Process -->
+    <section class="our-process">
+        <div class="container">
+            <h2>Our Process</h2>
+            <div class="process-steps">
+                <div class="process-step">
+                    <img src="/images/icons/check.svg" alt="Sourcing Icon" style="width: 50px; height: 50px;">
+                    <h3>Sourcing</h3>
+                    <p>We carefully select the best farms and regions for each spice.</p>
+                </div>
+                <div class="process-step">
+                    <img src="/images/icons/check.svg" alt="Processing Icon" style="width: 50px; height: 50px;">
+                    <h3>Processing</h3>
+                    <p>Our spices are cleaned, dried, and ground using traditional methods to preserve flavor.</p>
+                </div>
+                <div class="process-step">
+                    <img src="/images/icons/check.svg" alt="Packaging Icon" style="width: 50px; height: 50px;">
+                    <h3>Packaging</h3>
+                    <p>Spices are packed in airtight containers to maintain freshness and aroma.</p>
+                </div>
+                <div class="process-step">
+                    <img src="/images/icons/check.svg" alt="Delivery Icon" style="width: 50px; height: 50px;">
+                    <h3>Delivery</h3>
+                    <p>We ensure fast and secure delivery to your doorstep.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="container">
+            <h2>Meet Our Team</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="/images/team-cyriac.jpg" alt="Cyriac Paul Pullan">
+                    <h3>Cyriac Paul Pullan</h3>
+                    <p>Founder & CEO</p>
+                    <p class="team-bio">With over 15 years in the spice trade, Cyriac's vision and expertise guide our company's direction and quality standards.</p>
+                </div>
+                <div class="team-member">
+                    <img src="/images/team-daris.jpg" alt="Daris Sojan">
+                    <h3>Daris Sojan</h3>
+                    <p>Head of Operations</p>
+                    <p class="team-bio">Daris ensures our operations run smoothly, managing logistics and supply chain with precision and care.</p>
+                </div>
+                <div class="team-member">
+                    <img src="/images/team-alex.jpg" alt="Alex Benny">
+                    <h3>Alex Benny</h3>
+                    <p>Quality Control Manager</p>
+                    <p class="team-bio">Alex and his team maintain our rigorous quality standards, testing every batch that leaves our facility.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications -->
+    <section class="certifications">
+        <div class="container">
+            <h2>Certifications</h2>
+            <div class="certification-icons">
+                <img src="/images/quality-certificate.jpg" alt="ISO Certified" style="width: 100px; height: auto;">
+                <img src="/images/quality-certificate.jpg" alt="Organic Certified" style="width: 100px; height: auto;">
+                <img src="/images/quality-certificate.jpg" alt="Fair Trade Certified" style="width: 100px; height: auto;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>What Our Customers Say</h2>
+            <div class="testimonials-slider">
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>The quality of spices from Deli Spi is exceptional. I can really taste the difference in my cooking compared to store-bought spices. Their turmeric has such vibrant color and aroma!</p>
+                        <div class="testimonial-author">
+                            <img src="/images/customer-sarah.jpg" alt="Sarah K.">
+                            <div class="author-info">
+                                <h4>Sarah K.</h4>
+                                <p>Regular Customer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Experience Premium Spices?</h2>
+            <p>Join thousands of satisfied customers who trust Deli Spi for their spice needs. Taste the difference quality makes.</p>
+            <a href="products.html" class="btn">Shop Now</a>
+        </div>
+    </section>
+
+    <!-- WhatsApp Chat -->
+    <a href="https://wa.me/919876543210" class="whatsapp-chat" target="_blank" aria-label="Chat with us on WhatsApp">
+        <img src="/images/icons/whatsapp.svg" alt="Chat on WhatsApp">
+    </a>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>Email: info@delispi.com</p>
+                    <p>Phone: +91 123 456 7890</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="products.html">Products</a>
+                    <a href="about.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><img src="/images/icons/facebook.svg" alt="Facebook"></a>
+                        <a href="#" aria-label="Instagram"><img src="/images/icons/instagram.svg" alt="Instagram"></a>
+                        <a href="#" aria-label="Twitter"><img src="/images/icons/twitter.svg" alt="Twitter"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Deli Spi. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu');
+            const navLinks = document.querySelector('.nav-links');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+            
+            // Simple testimonial slider
+            const testimonials = [
+                {
+                    quote: "The quality of spices from Deli Spi is exceptional. I can really taste the difference in my cooking compared to store-bought spices. Their turmeric has such vibrant color and aroma!",
+                    name: "Sarah K.",
+                    role: "Regular Customer",
+                    image: "/images/customer-sarah.jpg"
+                },
+                {
+                    quote: "As a professional chef, I demand the best ingredients. Deli Spi consistently delivers premium quality spices that elevate my dishes. Their customer service is outstanding too.",
+                    name: "Raj M.",
+                    role: "Executive Chef",
+                    image: "/images/customer-raj.jpg"
+                },
+                {
+                    quote: "I've been using Deli Spi products for my home cooking for years. The flavors are so much more vibrant than anything else I've tried. Their cinnamon is particularly amazing!",
+                    name: "Priya N.",
+                    role: "Home Cook",
+                    image: "/images/customer-priya.jpg"
+                }
+            ];
+            
+            const testimonialContainer = document.querySelector('.testimonial-content');
+            let currentTestimonial = 0;
+            
+            function showTestimonial(index) {
+                const testimonial = testimonials[index];
+                testimonialContainer.innerHTML = `
+                    <p>${testimonial.quote}</p>
+                    <div class="testimonial-author">
+                        <img src="${testimonial.image}" alt="${testimonial.name}">
+                        <div class="author-info">
+                            <h4>${testimonial.name}</h4>
+                            <p>${testimonial.role}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Rotate testimonials every 5 seconds
+            showTestimonial(currentTestimonial);
+            setInterval(() => {
+                currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+                showTestimonial(currentTestimonial);
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

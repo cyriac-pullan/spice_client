@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ title }}</h2>
+        <a href="{{ url_for('admin.categories') }}" class="btn btn-outline-secondary">
+            <i data-feather="arrow-left" size="16"></i> Back to Categories
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.name.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="3") }}
+                            <div class="form-text">Describe what products belong in this category</div>
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.slug.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">/products/category/</span>
+                                {{ form.slug(class="form-control") }}
+                            </div>
+                            <div class="form-text">URL-friendly name (lowercase, hyphens only). Leave blank to auto-generate.</div>
+                            {% if form.slug.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.slug.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if category %}Update Category{% else %}Create Category{% endif %}
+                            </button>
+                            <a href="{{ url_for('admin.categories') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Category Preview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i data-feather="{% if 'spice' in (form.name.data or '').lower() %}star{% elif 'herb' in (form.name.data or '').lower() %}leaf{% else %}package{% endif %}" size="48" class="text-primary"></i>
+                    </div>
+                    <h6 id="preview-name">Category Name</h6>
+                    <p class="text-muted" id="preview-description">Category description will appear here...</p>
+                    <small class="text-muted">
+                        URL: <code id="preview-slug">/products/category/slug</code>
+                    </small>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6>Category Guidelines</h6>
+                    <ul class="list-unstyled small">
+                        <li><i data-feather="check" size="12" class="text-success me-2"></i> Use clear, descriptive names</li>
+                        <li><i data-feather="check" size="12" class="text-success me-2"></i> Keep descriptions concise</li>
+                        <li><i data-feather="check" size="12" class="text-success me-2"></i> Use lowercase slugs with hyphens</li>
+                        <li><i data-feather="check" size="12" class="text-success me-2"></i> Avoid overlapping categories</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Live category preview
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.getElementById('name');
+    const descriptionInput = document.getElementById('description');
+    const slugInput = document.getElementById('slug');
+    
+    const previewName = document.getElementById('preview-name');
+    const previewDescription = document.getElementById('preview-description');
+    const previewSlug = document.getElementById('preview-slug');
+    
+    function generateSlug(text) {
+        return text.toLowerCase()
+                   .replace(/[^a-z0-9\s-]/g, '')
+                   .replace(/\s+/g, '-')
+                   .replace(/-+/g, '-')
+                   .trim('-');
+    }
+    
+    function updatePreview() {
+        const name = nameInput.value || 'Category Name';
+        const description = descriptionInput.value || 'Category description will appear here...';
+        let slug = slugInput.value;
+        
+        // Auto-generate slug if empty
+        if (!slug && nameInput.value) {
+            slug = generateSlug(nameInput.value);
+            slugInput.value = slug;
+        }
+        
+        previewName.textContent = name;
+        previewDescription.textContent = description;
+        previewSlug.textContent = `/products/category/${slug || 'slug'}`;
+        
+        // Update icon based on category name
+        const icon = document.querySelector('.card-body i[data-feather]');
+        if (icon) {
+            const nameLower = name.toLowerCase();
+            let iconName = 'package';
+            if (nameLower.includes('spice')) iconName = 'star';
+            else if (nameLower.includes('herb')) iconName = 'leaf';
+            
+            icon.setAttribute('data-feather', iconName);
+            feather.replace();
+        }
+    }
+    
+    // Listen for input changes
+    nameInput.addEventListener('input', updatePreview);
+    descriptionInput.addEventListener('input', updatePreview);
+    slugInput.addEventListener('input', updatePreview);
+    
+    // Initial update
+    updatePreview();
+});
+</script>
+{% endblock %}

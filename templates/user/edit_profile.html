@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Deli Spi{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i data-feather="user" size="48" class="text-primary"></i>
+                        <h5 class="mt-2">{{ current_user.first_name }} {{ current_user.last_name }}</h5>
+                        <p class="text-muted">{{ current_user.email }}</p>
+                    </div>
+                    
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('main.profile') }}" class="list-group-item list-group-item-action">
+                            <i data-feather="user" size="14"></i> Profile
+                        </a>
+                        <a href="{{ url_for('main.orders') }}" class="list-group-item list-group-item-action">
+                            <i data-feather="package" size="14"></i> Orders
+                        </a>
+                        <a href="{{ url_for('main.addresses') }}" class="list-group-item list-group-item-action">
+                            <i data-feather="map-pin" size="14"></i> Addresses
+                        </a>
+                        <a href="{{ url_for('main.edit_profile') }}" class="list-group-item list-group-item-action active">
+                            <i data-feather="edit" size="14"></i> Edit Profile
+                        </a>
+                        <a href="{{ url_for('main.change_password') }}" class="list-group-item list-group-item-action">
+                            <i data-feather="lock" size="14"></i> Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Edit Profile</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.first_name.label(class="form-label") }}
+                                {{ form.first_name(class="form-control") }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.first_name.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.last_name.label(class="form-label") }}
+                                {{ form.last_name(class="form-control") }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.last_name.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.phone.label(class="form-label") }}
+                            {{ form.phone(class="form-control") }}
+                            <div class="form-text">Optional: Your phone number for order updates</div>
+                            {% if form.phone.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.phone.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
+                            <div class="form-text">Contact support to change your email address</div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i data-feather="save" size="16"></i> Update Profile
+                            </button>
+                            <a href="{{ url_for('main.profile') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

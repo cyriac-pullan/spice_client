@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Categories - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Categories</h2>
+        <a href="{{ url_for('admin.new_category') }}" class="btn btn-primary">
+            <i data-feather="plus" size="16"></i> Add New Category
+        </a>
+    </div>
+    
+    {% if categories %}
+        <div class="row">
+            {% for category in categories %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text">{{ category.description }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">Slug: {{ category.slug }}</small>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-primary">Edit</button>
+                            <button type="button" class="btn btn-outline-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i data-feather="grid" size="64" class="text-muted mb-3"></i>
+            <h3>No categories yet</h3>
+            <p class="text-muted">Add your first category to organize products.</p>
+            <a href="{{ url_for('admin.new_category') }}" class="btn btn-primary">Add Category</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
