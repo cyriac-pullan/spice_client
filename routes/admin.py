@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from functools import wraps
 from models import Product, Category, Order, User
 from forms import ProductForm, CategoryForm
+from sqlalchemy import func
+from app import db
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -19,26 +21,36 @@ def admin_required(f):
 @login_required
 @admin_required
 def dashboard():
-    # Get some basic stats
-    total_products = len(Product.get_admin_products())
-    total_categories = len(Category.get_all())
-    total_orders = len(Order.get_all_orders())
+    # Get dashboard statistics
+    total_orders = Order.query.count()
+    total_revenue = db.session.query(func.sum(Order.total_amount)).scalar() or 0
+    total_users = User.query.count()
+    total_products = Product.query.count()
     
     # Get recent orders
-    recent_orders = Order.get_all_orders()[:5]
+    recent_orders = Order.query.order_by(Order.created_at.desc()).limit(5).all()
     
-    return render_template('admin/dashboard.html',
-                         total_products=total_products,
-                         total_categories=total_categories,
-                         total_orders=total_orders,
-                         recent_orders=recent_orders)
+    stats = {
+        'total_orders': total_orders,
+        'total_revenue': float(total_revenue),
+        'total_users': total_users,
+        'total_products': total_products
+    }
+    
+    return render_template('admin/dashboard.html', stats=stats, recent_orders=recent_orders)
 
 @admin_bp.route('/products')
 @login_required
 @admin_required
 def products():
     products = Product.get_admin_products()
-    return render_template('admin/products.html', products=products)
+    form = ProductForm()
+    
+    # Populate category choices
+    categories = Category.get_all()
+    form.category.choices = [(str(cat.id), cat.name) for cat in categories]
+    
+    return render_template('admin/products.html', products=products, form=form)
 
 @admin_bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
@@ -46,73 +58,68 @@ def products():
 def new_product():
     form = ProductForm()
     categories = Category.get_all()
-    form.category.choices = [(c.id, c.name) for c in categories]
+    form.category.choices = [(str(c.id), c.name) for c in categories]
     
     if form.validate_on_submit():
-        product = Product.create_product(
-            name=form.name.data,
-            description=form.description.data,
-            price=form.price.data,
-            category_id=form.category.data,
-            stock_quantity=form.stock_quantity.data,
-            sku=form.sku.data,
-            image=form.image.data
-        )
-        flash('Product created successfully!', 'success')
-        return redirect(url_for('admin.products'))
+        try:
+            product = Product.create_product(
+                name=form.name.data,
+                description=form.description.data,
+                price=form.price.data,
+                category_id=int(form.category.data),
+                stock_quantity=form.stock_quantity.data,
+                sku=form.sku.data,
+                image=form.image.data
+            )
+            flash('Product created successfully!', 'success')
+            return redirect(url_for('admin.products'))
+        except Exception as e:
+            flash(f'Error creating product: {str(e)}', 'error')
     
     return render_template('admin/product_form.html', form=form, title='New Product')
 
-@admin_bp.route('/products/<product_id>/edit', methods=['GET', 'POST'])
+@admin_bp.route('/products/<int:product_id>/edit', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def edit_product(product_id):
-    product = Product.get_by_id(product_id)
-    if not product:
-        flash('Product not found.', 'error')
-        return redirect(url_for('admin.products'))
+    product = Product.query.get_or_404(product_id)
     
     form = ProductForm(obj=product)
     categories = Category.get_all()
-    form.category.choices = [(c.id, c.name) for c in categories]
+    form.category.choices = [(str(c.id), c.name) for c in categories]
+    form.category.data = str(product.category_id)
     
     if form.validate_on_submit():
-        product.update(
-            name=form.name.data,
-            description=form.description.data,
-            price=form.price.data,
-            category_id=form.category.data,
-            stock_quantity=form.stock_quantity.data,
-            sku=form.sku.data,
-            image=form.image.data
-        )
-        flash('Product updated successfully!', 'success')
-        return redirect(url_for('admin.products'))
-    
-    # Pre-populate form with current values
-    if request.method == 'GET':
-        form.name.data = product.name
-        form.description.data = product.description
-        form.price.data = product.price
-        form.category.data = str(product.category)
-        form.stock_quantity.data = product.stock_quantity
-        form.sku.data = product.sku
-        form.image.data = product.image
+        try:
+            product.update(
+                name=form.name.data,
+                description=form.description.data,
+                price=form.price.data,
+                category_id=int(form.category.data),
+                stock_quantity=form.stock_quantity.data,
+                sku=form.sku.data,
+                image=form.image.data or ''
+            )
+            flash('Product updated successfully!', 'success')
+            return redirect(url_for('admin.products'))
+        except Exception as e:
+            flash(f'Error updating product: {str(e)}', 'error')
     
     return render_template('admin/product_form.html', form=form, product=product, title='Edit Product')
 
-@admin_bp.route('/products/<product_id>/delete')
+@admin_bp.route('/products/<int:product_id>/delete', methods=['POST'])
 @login_required
 @admin_required
 def delete_product(product_id):
-    product = Product.get_by_id(product_id)
-    if product:
-        product.delete()
-        flash('Product deleted successfully!', 'success')
-    else:
-        flash('Product not found.', 'error')
-    
-    return redirect(url_for('admin.products'))
+    try:
+        product = Product.query.get(product_id)
+        if product:
+            product.delete()
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Product not found'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @admin_bp.route('/categories')
 @login_required

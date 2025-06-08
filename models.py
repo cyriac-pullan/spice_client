@@ -127,11 +127,15 @@ class Product(db.Model):
         return query.offset(offset).limit(limit).all()
 
     @staticmethod
+    def get_by_id(product_id):
+        return Product.query.get(product_id)
+
+    @staticmethod
     def get_admin_products():
         return Product.query.all()
 
     @staticmethod
-    def create_product(name, description, price, category_id, stock_quantity, sku, image='', original_price=None):
+    def create_product(name, description, price, category_id, stock_quantity, sku, image=None, original_price=None):
         product = Product(
             name=name,
             description=description,
@@ -140,7 +144,7 @@ class Product(db.Model):
             category_id=category_id,
             stock_quantity=stock_quantity,
             sku=sku,
-            image=image
+            image=image or ''
         )
         db.session.add(product)
         db.session.commit()
