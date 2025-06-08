@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers Management - Deli Spi Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Deli Spi Admin</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                <li><a href="{{ url_for('admin.products') }}"><i class="fas fa-box"></i> <span>Products</span></a></li>
+                <li><a href="{{ url_for('admin.orders') }}"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
+                <li><a href="{{ url_for('admin.customers') }}" class="active"><i class="fas fa-users"></i> <span>Customers</span></a></li>
+                <li><a href="{{ url_for('main.index') }}"><i class="fas fa-external-link-alt"></i> <span>View Site</span></a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Customers Management</h1>
+                <div class="user-info">
+                    <span>Admin User</span>
+                </div>
+            </div>
+
+            <!-- Customer Stats -->
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span class="card-title">Total Customers</span>
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">{{ customers|length }}</div>
+                    <div class="card-change">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>All registered users</span>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <span class="card-title">Active Customers</span>
+                        <div class="card-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">{{ customers|length }}</div>
+                    <div class="card-change">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Active accounts</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="table-title">All Customers</h2>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Joined Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem;">
+                                        {{ customer.first_name[0] }}{{ customer.last_name[0] }}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--dark-color);">{{ customer.first_name }} {{ customer.last_name }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ customer.email }}</td>
+                            <td>{{ customer.phone or 'N/A' }}</td>
+                            <td>{{ customer.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <span class="status-badge status-active">
+                                    Active
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

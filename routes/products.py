@@ -32,7 +32,7 @@ def product_detail(product_id):
         return redirect(url_for('products.products'))
     
     # Get related products from same category
-    related_products = Product.get_all(category=str(product.category), limit=4)
+    related_products = Product.get_all(category=product.category_id, limit=4)
     related_products = [p for p in related_products if p.id != product.id]
     
     return render_template('product_detail.html', 

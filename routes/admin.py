@@ -151,3 +151,10 @@ def new_category():
 def orders():
     orders = Order.get_all_orders()
     return render_template('admin/orders.html', orders=orders)
+
+@admin_bp.route('/customers')
+@login_required
+@admin_required
+def customers():
+    customers = User.query.filter_by(role='user').all()
+    return render_template('admin/customers.html', customers=customers)
