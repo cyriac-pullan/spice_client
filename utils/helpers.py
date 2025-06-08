@@ -7,13 +7,17 @@ def get_cart_items():
     cart_items = []
     
     for product_id, quantity in cart.items():
-        product = Product.get_by_id(product_id)
-        if product:
-            cart_items.append({
-                'product': product,
-                'quantity': quantity,
-                'subtotal': product.price * quantity
-            })
+        try:
+            product = Product.query.get(int(product_id))
+            if product and product.status == 'active':
+                cart_items.append({
+                    'product': product,
+                    'quantity': quantity,
+                    'subtotal': float(product.price) * quantity
+                })
+        except (ValueError, TypeError):
+            # Remove invalid product from cart
+            pass
     
     return cart_items
 

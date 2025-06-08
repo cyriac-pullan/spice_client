@@ -1,297 +1,367 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from bson import ObjectId
 from datetime import datetime
-from utils.db import get_db
+from app import db
 
-class User(UserMixin):
-    def __init__(self, user_data):
-        self.id = str(user_data.get('_id'))
-        self.first_name = user_data.get('firstName', '')
-        self.last_name = user_data.get('lastName', '')
-        self.email = user_data.get('email')
-        self.password_hash = user_data.get('password')
-        self.phone = user_data.get('phone', '')
-        self.role = user_data.get('role', 'user')
-        self.wishlist = user_data.get('wishlist', [])
-        self.created_at = user_data.get('createdAt', datetime.utcnow())
-
-    @staticmethod
-    def get_by_id(user_id):
-        db = get_db()
-        user_data = db.users.find_one({'_id': ObjectId(user_id)})
-        if user_data:
-            return User(user_data)
-        return None
-
-    @staticmethod
-    def get_by_email(email):
-        db = get_db()
-        user_data = db.users.find_one({'email': email})
-        if user_data:
-            return User(user_data)
-        return None
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    phone = db.Column(db.String(20))
+    role = db.Column(db.String(20), default='user')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    orders = db.relationship('Order', backref='user', lazy=True)
+    addresses = db.relationship('Address', backref='user', lazy=True)
+    wishlist_items = db.relationship('WishlistItem', backref='user', lazy=True)
 
     @staticmethod
     def create_user(first_name, last_name, email, password, phone=''):
-        db = get_db()
         # Check if user already exists
-        if db.users.find_one({'email': email}):
+        if User.query.filter_by(email=email).first():
             return None
         
-        user_data = {
-            'firstName': first_name,
-            'lastName': last_name,
-            'email': email,
-            'password': generate_password_hash(password),
-            'phone': phone,
-            'role': 'user',
-            'wishlist': [],
-            'createdAt': datetime.utcnow()
-        }
-        result = db.users.insert_one(user_data)
-        user_data['_id'] = result.inserted_id
-        return User(user_data)
+        user = User(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password_hash=generate_password_hash(password),
+            phone=phone
+        )
+        db.session.add(user)
+        db.session.commit()
+        return user
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
     def update_profile(self, first_name, last_name, phone=''):
-        db = get_db()
-        db.users.update_one(
-            {'_id': ObjectId(self.id)},
-            {'$set': {
-                'firstName': first_name,
-                'lastName': last_name,
-                'phone': phone
-            }}
-        )
         self.first_name = first_name
         self.last_name = last_name
         self.phone = phone
+        db.session.commit()
 
     def change_password(self, new_password):
-        db = get_db()
-        new_hash = generate_password_hash(new_password)
-        db.users.update_one(
-            {'_id': ObjectId(self.id)},
-            {'$set': {'password': new_hash}}
-        )
-        self.password_hash = new_hash
+        self.password_hash = generate_password_hash(new_password)
+        db.session.commit()
 
     def add_to_wishlist(self, product_id):
-        db = get_db()
-        if ObjectId(product_id) not in self.wishlist:
-            db.users.update_one(
-                {'_id': ObjectId(self.id)},
-                {'$push': {'wishlist': ObjectId(product_id)}}
-            )
-            self.wishlist.append(ObjectId(product_id))
+        if not WishlistItem.query.filter_by(user_id=self.id, product_id=product_id).first():
+            wishlist_item = WishlistItem(user_id=self.id, product_id=product_id)
+            db.session.add(wishlist_item)
+            db.session.commit()
 
     def remove_from_wishlist(self, product_id):
-        db = get_db()
-        db.users.update_one(
-            {'_id': ObjectId(self.id)},
-            {'$pull': {'wishlist': ObjectId(product_id)}}
-        )
-        self.wishlist = [pid for pid in self.wishlist if str(pid) != product_id]
+        wishlist_item = WishlistItem.query.filter_by(user_id=self.id, product_id=product_id).first()
+        if wishlist_item:
+            db.session.delete(wishlist_item)
+            db.session.commit()
 
-class Product:
-    def __init__(self, product_data):
-        self.id = str(product_data.get('_id'))
-        self.name = product_data.get('name')
-        self.description = product_data.get('description')
-        self.price = product_data.get('price')
-        self.category = product_data.get('category')
-        self.stock_quantity = product_data.get('stockQuantity', 0)
-        self.sku = product_data.get('sku')
-        self.status = product_data.get('status', 'active')
-        self.image = product_data.get('image', '/static/images/placeholder.jpg')
-        self.created_at = product_data.get('createdAt', datetime.utcnow())
-
-    @staticmethod
-    def get_all(category=None, search=None, limit=20, offset=0):
-        db = get_db()
-        query = {'status': 'active'}
-        
-        if category:
-            query['category'] = ObjectId(category)
-        
-        if search:
-            query['$or'] = [
-                {'name': {'$regex': search, '$options': 'i'}},
-                {'description': {'$regex': search, '$options': 'i'}}
-            ]
-        
-        products_data = db.products.find(query).sort('createdAt', -1).limit(limit).skip(offset)
-        return [Product(p) for p in products_data]
-
-    @staticmethod
-    def get_by_id(product_id):
-        db = get_db()
-        product_data = db.products.find_one({'_id': ObjectId(product_id), 'status': 'active'})
-        if product_data:
-            return Product(product_data)
-        return None
-
-    @staticmethod
-    def get_admin_products():
-        db = get_db()
-        products_data = db.products.find().sort('createdAt', -1)
-        return [Product(p) for p in products_data]
-
-    @staticmethod
-    def create_product(name, description, price, category_id, stock_quantity, sku, image=''):
-        db = get_db()
-        product_data = {
-            'name': name,
-            'description': description,
-            'price': float(price),
-            'category': ObjectId(category_id),
-            'stockQuantity': int(stock_quantity),
-            'sku': sku,
-            'status': 'active',
-            'image': image or '/static/images/placeholder.jpg',
-            'createdAt': datetime.utcnow()
-        }
-        result = db.products.insert_one(product_data)
-        product_data['_id'] = result.inserted_id
-        return Product(product_data)
-
-    def update(self, name, description, price, category_id, stock_quantity, sku, image=None):
-        db = get_db()
-        update_data = {
-            'name': name,
-            'description': description,
-            'price': float(price),
-            'category': ObjectId(category_id),
-            'stockQuantity': int(stock_quantity),
-            'sku': sku
-        }
-        if image:
-            update_data['image'] = image
-        
-        db.products.update_one(
-            {'_id': ObjectId(self.id)},
-            {'$set': update_data}
-        )
-
-    def delete(self):
-        db = get_db()
-        db.products.update_one(
-            {'_id': ObjectId(self.id)},
-            {'$set': {'status': 'inactive'}}
-        )
-
-class Category:
-    def __init__(self, category_data):
-        self.id = str(category_data.get('_id'))
-        self.name = category_data.get('name')
-        self.description = category_data.get('description')
-        self.slug = category_data.get('slug')
-        self.status = category_data.get('status', 'active')
+class Category(db.Model):
+    __tablename__ = 'categories'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    description = db.Column(db.Text)
+    slug = db.Column(db.String(50), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    products = db.relationship('Product', backref='category', lazy=True)
 
     @staticmethod
     def get_all():
-        db = get_db()
-        categories_data = db.categories.find({'status': 'active'})
-        return [Category(c) for c in categories_data]
-
-    @staticmethod
-    def get_by_id(category_id):
-        db = get_db()
-        category_data = db.categories.find_one({'_id': ObjectId(category_id)})
-        if category_data:
-            return Category(category_data)
-        return None
+        return Category.query.all()
 
     @staticmethod
     def create_category(name, description, slug):
-        db = get_db()
-        category_data = {
-            'name': name,
-            'description': description,
-            'slug': slug,
-            'status': 'active'
-        }
-        result = db.categories.insert_one(category_data)
-        category_data['_id'] = result.inserted_id
-        return Category(category_data)
+        category = Category(
+            name=name,
+            description=description,
+            slug=slug
+        )
+        db.session.add(category)
+        db.session.commit()
+        return category
 
-class Order:
-    def __init__(self, order_data):
-        self.id = str(order_data.get('_id'))
-        self.user = order_data.get('user')
-        self.items = order_data.get('items', [])
-        self.shipping_address = order_data.get('shippingAddress', {})
-        self.billing_address = order_data.get('billingAddress', {})
-        self.total_amount = order_data.get('totalAmount', 0)
-        self.status = order_data.get('status', 'pending')
-        self.created_at = order_data.get('createdAt', datetime.utcnow())
+class Product(db.Model):
+    __tablename__ = 'products'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
+    original_price = db.Column(db.Numeric(10, 2))
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+    stock_quantity = db.Column(db.Integer, nullable=False, default=0)
+    sku = db.Column(db.String(50), unique=True, nullable=False)
+    image = db.Column(db.String(255))
+    status = db.Column(db.String(20), default='active')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    order_items = db.relationship('OrderItem', backref='product', lazy=True)
+    wishlist_items = db.relationship('WishlistItem', backref='product', lazy=True)
 
     @staticmethod
-    def create_order(user_id, items, shipping_address, billing_address, total_amount):
-        db = get_db()
-        order_data = {
-            'user': ObjectId(user_id),
-            'items': items,
-            'shippingAddress': shipping_address,
-            'billingAddress': billing_address,
-            'totalAmount': float(total_amount),
-            'status': 'pending',
-            'createdAt': datetime.utcnow()
-        }
-        result = db.orders.insert_one(order_data)
-        order_data['_id'] = result.inserted_id
-        return Order(order_data)
+    def get_all(category=None, search=None, limit=20, offset=0):
+        query = Product.query.filter_by(status='active')
+        
+        if category:
+            query = query.filter(Product.category_id == category)
+        
+        if search:
+            search_term = f"%{search}%"
+            query = query.filter(
+                db.or_(
+                    Product.name.ilike(search_term),
+                    Product.description.ilike(search_term)
+                )
+            )
+        
+        return query.offset(offset).limit(limit).all()
+
+    @staticmethod
+    def get_admin_products():
+        return Product.query.all()
+
+    @staticmethod
+    def create_product(name, description, price, category_id, stock_quantity, sku, image='', original_price=None):
+        product = Product(
+            name=name,
+            description=description,
+            price=price,
+            original_price=original_price,
+            category_id=category_id,
+            stock_quantity=stock_quantity,
+            sku=sku,
+            image=image
+        )
+        db.session.add(product)
+        db.session.commit()
+        return product
+
+    def update(self, name, description, price, category_id, stock_quantity, sku, image=None, original_price=None):
+        self.name = name
+        self.description = description
+        self.price = price
+        self.original_price = original_price
+        self.category_id = category_id
+        self.stock_quantity = stock_quantity
+        self.sku = sku
+        if image:
+            self.image = image
+        db.session.commit()
+
+    def delete(self):
+        self.status = 'inactive'
+        db.session.commit()
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    total_amount = db.Column(db.Numeric(10, 2), nullable=False)
+    status = db.Column(db.String(20), default='pending')
+    payment_status = db.Column(db.String(20), default='pending')
+    shipping_address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
+    billing_address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    items = db.relationship('OrderItem', backref='order', lazy=True)
+    shipping_address = db.relationship('Address', foreign_keys=[shipping_address_id])
+    billing_address = db.relationship('Address', foreign_keys=[billing_address_id])
+
+    @staticmethod
+    def create_order(user_id, items, shipping_address_id, billing_address_id, total_amount):
+        order = Order(
+            user_id=user_id,
+            total_amount=total_amount,
+            shipping_address_id=shipping_address_id,
+            billing_address_id=billing_address_id
+        )
+        db.session.add(order)
+        db.session.flush()  # Get the order ID
+        
+        # Add order items
+        for item in items:
+            order_item = OrderItem(
+                order_id=order.id,
+                product_id=item['product_id'],
+                quantity=item['quantity'],
+                price=item['price']
+            )
+            db.session.add(order_item)
+        
+        db.session.commit()
+        return order
 
     @staticmethod
     def get_user_orders(user_id):
-        db = get_db()
-        orders_data = db.orders.find({'user': ObjectId(user_id)}).sort('createdAt', -1)
-        return [Order(o) for o in orders_data]
+        return Order.query.filter_by(user_id=user_id).order_by(Order.created_at.desc()).all()
 
     @staticmethod
     def get_all_orders():
-        db = get_db()
-        orders_data = db.orders.find().sort('createdAt', -1)
-        return [Order(o) for o in orders_data]
+        return Order.query.order_by(Order.created_at.desc()).all()
 
-class Address:
-    def __init__(self, address_data):
-        self.id = str(address_data.get('_id'))
-        self.user = address_data.get('user')
-        self.first_name = address_data.get('firstName')
-        self.last_name = address_data.get('lastName')
-        self.address_line1 = address_data.get('addressLine1')
-        self.address_line2 = address_data.get('addressLine2', '')
-        self.city = address_data.get('city')
-        self.state = address_data.get('state')
-        self.postal_code = address_data.get('postalCode')
-        self.country = address_data.get('country')
-        self.is_default = address_data.get('isDefault', False)
+class OrderItem(db.Model):
+    __tablename__ = 'order_items'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Numeric(10, 2), nullable=False)
 
-    @staticmethod
-    def get_user_addresses(user_id):
-        db = get_db()
-        addresses_data = db.addresses.find({'user': ObjectId(user_id)})
-        return [Address(a) for a in addresses_data]
+class Address(db.Model):
+    __tablename__ = 'addresses'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    address_line1 = db.Column(db.String(255), nullable=False)
+    address_line2 = db.Column(db.String(255))
+    city = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(100), nullable=False)
+    postal_code = db.Column(db.String(20), nullable=False)
+    country = db.Column(db.String(100), nullable=False)
+    is_default = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     @staticmethod
     def create_address(user_id, first_name, last_name, address_line1, address_line2, city, state, postal_code, country, is_default=False):
-        db = get_db()
-        address_data = {
-            'user': ObjectId(user_id),
-            'firstName': first_name,
-            'lastName': last_name,
-            'addressLine1': address_line1,
-            'addressLine2': address_line2,
-            'city': city,
-            'state': state,
-            'postalCode': postal_code,
-            'country': country,
-            'isDefault': is_default
+        # If this is set as default, remove default from other addresses
+        if is_default:
+            Address.query.filter_by(user_id=user_id, is_default=True).update({'is_default': False})
+        
+        address = Address(
+            user_id=user_id,
+            first_name=first_name,
+            last_name=last_name,
+            address_line1=address_line1,
+            address_line2=address_line2,
+            city=city,
+            state=state,
+            postal_code=postal_code,
+            country=country,
+            is_default=is_default
+        )
+        db.session.add(address)
+        db.session.commit()
+        return address
+
+    @staticmethod
+    def get_user_addresses(user_id):
+        return Address.query.filter_by(user_id=user_id).all()
+
+class WishlistItem(db.Model):
+    __tablename__ = 'wishlist_items'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (db.UniqueConstraint('user_id', 'product_id'),)
+
+def create_sample_data():
+    """Create sample data for testing"""
+    # Check if data already exists
+    if User.query.first():
+        return
+    
+    # Create categories
+    categories = [
+        {'name': 'Whole Spices', 'slug': 'whole-spices', 'description': 'Premium whole spices for authentic flavors'},
+        {'name': 'Ground Spices', 'slug': 'ground-spices', 'description': 'Fresh ground spices and masalas'},
+        {'name': 'Spice Blends', 'slug': 'spice-blends', 'description': 'Traditional spice mix blends'},
+        {'name': 'Herbs', 'slug': 'herbs', 'description': 'Fresh and dried herbs'},
+        {'name': 'Seeds', 'slug': 'seeds', 'description': 'Aromatic seeds for cooking'}
+    ]
+    
+    for cat_data in categories:
+        Category.create_category(**cat_data)
+    
+    # Create admin user
+    admin_user = User.create_user(
+        first_name='Admin',
+        last_name='User',
+        email='admin@delispi.com',
+        password='admin123',
+        phone='+1234567890'
+    )
+    admin_user.role = 'admin'
+    db.session.commit()
+    
+    # Create regular user
+    User.create_user(
+        first_name='John',
+        last_name='Doe',
+        email='john@example.com',
+        password='password123',
+        phone='+1987654321'
+    )
+    
+    # Create products
+    products = [
+        {
+            'name': 'Cardamom Pods',
+            'description': 'Premium green cardamom pods with intense aroma and flavor. Perfect for biryanis, desserts, and chai.',
+            'price': 12.99,
+            'original_price': 15.99,
+            'category_id': 1,  # Whole Spices
+            'stock_quantity': 50,
+            'sku': 'CARD001',
+            'image': '/static/images/products/cardamom.jpg'
+        },
+        {
+            'name': 'Turmeric Powder',
+            'description': 'Fresh ground turmeric powder with vibrant color and earthy flavor. Essential for Indian cooking.',
+            'price': 8.99,
+            'original_price': 10.99,
+            'category_id': 2,  # Ground Spices
+            'stock_quantity': 75,
+            'sku': 'TURM001',
+            'image': '/static/images/products/turmeric.jpg'
+        },
+        {
+            'name': 'Garam Masala',
+            'description': 'Traditional blend of warming spices including cinnamon, cardamom, cloves, and black pepper.',
+            'price': 9.99,
+            'category_id': 3,  # Spice Blends
+            'stock_quantity': 40,
+            'sku': 'GARA001',
+            'image': '/static/images/products/garam-masala.jpg'
+        },
+        {
+            'name': 'Fresh Curry Leaves',
+            'description': 'Aromatic curry leaves, essential for South Indian cooking. Adds authentic flavor to any dish.',
+            'price': 6.99,
+            'category_id': 4,  # Herbs
+            'stock_quantity': 25,
+            'sku': 'CURR001',
+            'image': '/static/images/products/curry-leaves.jpg'
+        },
+        {
+            'name': 'Cumin Seeds',
+            'description': 'Whole cumin seeds with earthy, warm flavor. Perfect for tempering and spice blends.',
+            'price': 7.99,
+            'category_id': 5,  # Seeds
+            'stock_quantity': 60,
+            'sku': 'CUMI001',
+            'image': '/static/images/products/cumin-seeds.jpg'
         }
-        result = db.addresses.insert_one(address_data)
-        address_data['_id'] = result.inserted_id
-        return Address(address_data)
+    ]
+    
+    for product_data in products:
+        Product.create_product(**product_data)
+    
+    print("Sample data created successfully!")
