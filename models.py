@@ -21,6 +21,10 @@ class User(UserMixin, db.Model):
     wishlist_items = db.relationship('WishlistItem', backref='user', lazy=True)
 
     @staticmethod
+    def get_by_email(email):
+        return User.query.filter_by(email=email).first()
+
+    @staticmethod
     def create_user(first_name, last_name, email, password, phone=''):
         # Check if user already exists
         if User.query.filter_by(email=email).first():

@@ -44,7 +44,14 @@ def add_to_cart_route():
     product_id = request.form.get('product_id')
     quantity = int(request.form.get('quantity', 1))
     
-    product = Product.get_by_id(product_id)
+    # Validate product_id is a valid integer
+    try:
+        product_id_int = int(product_id)
+    except (ValueError, TypeError):
+        flash('Invalid product.', 'error')
+        return redirect(url_for('products.products'))
+    
+    product = Product.get_by_id(product_id_int)
     if not product:
         flash('Product not found.', 'error')
         return redirect(url_for('products.products'))
@@ -53,7 +60,7 @@ def add_to_cart_route():
         flash('Not enough stock available.', 'error')
         return redirect(url_for('products.product_detail', product_id=product_id))
     
-    add_to_cart(product_id, quantity)
+    add_to_cart(str(product_id_int), quantity)
     flash(f'{product.name} added to cart!', 'success')
     
     return redirect(url_for('products.product_detail', product_id=product_id))
@@ -69,13 +76,20 @@ def update_cart():
     product_id = request.form.get('product_id')
     quantity = int(request.form.get('quantity', 0))
     
+    # Validate product_id is a valid integer
+    try:
+        product_id_int = int(product_id)
+    except (ValueError, TypeError):
+        flash('Invalid product.', 'error')
+        return redirect(url_for('products.cart'))
+    
     if quantity <= 0:
-        remove_from_cart(product_id)
+        remove_from_cart(str(product_id_int))
         flash('Item removed from cart.', 'info')
     else:
-        product = Product.get_by_id(product_id)
+        product = Product.get_by_id(product_id_int)
         if product and quantity <= product.stock_quantity:
-            update_cart_item(product_id, quantity)
+            update_cart_item(str(product_id_int), quantity)
             flash('Cart updated.', 'success')
         else:
             flash('Invalid quantity or insufficient stock.', 'error')
@@ -84,8 +98,13 @@ def update_cart():
 
 @products_bp.route('/remove-from-cart/<product_id>')
 def remove_from_cart_route(product_id):
-    remove_from_cart(product_id)
-    flash('Item removed from cart.', 'info')
+    # Validate product_id is a valid integer
+    try:
+        product_id_int = int(product_id)
+        remove_from_cart(str(product_id_int))
+        flash('Item removed from cart.', 'info')
+    except (ValueError, TypeError):
+        flash('Invalid product.', 'error')
     return redirect(url_for('products.cart'))
 
 @products_bp.route('/wishlist/add/<product_id>')
