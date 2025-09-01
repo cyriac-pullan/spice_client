@@ -1,9 +1,15 @@
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import login_required, current_user
 from models import Product, Category
 from utils.helpers import get_cart_items, add_to_cart, update_cart_item, remove_from_cart
 
 products_bp = Blueprint('products', __name__)
+
+@products_bp.route('/cart-count')
+def cart_count():
+    from utils.helpers import get_cart_count
+    return jsonify({'count': get_cart_count()})
 
 @products_bp.route('/')
 def products():
@@ -24,17 +30,15 @@ def products():
                          search_query=search,
                          page=page)
 
-@products_bp.route('/<product_id>')
+@products_bp.route('/<int:product_id>')
 def product_detail(product_id):
     product = Product.get_by_id(product_id)
     if not product:
         flash('Product not found.', 'error')
         return redirect(url_for('products.products'))
-    
     # Get related products from same category
     related_products = Product.get_all(category=product.category_id, limit=4)
     related_products = [p for p in related_products if p.id != product.id]
-    
     return render_template('product_detail.html', 
                          product=product, 
                          related_products=related_products)
