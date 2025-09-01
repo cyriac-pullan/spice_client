@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-lg-8">
             {% for item in cart_items %}
-            <div class="card mb-3">
+            <div class="card mb-3" data-product-id="{{ item.product.id }}">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-2">

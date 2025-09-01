@@ -1,3 +1,6 @@
+<script>
+    window.sessionCartCount = {{ session.cart.values() | sum if session.cart else 0 }};
+</script>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
@@ -46,11 +49,9 @@
                         <a class="nav-link position-relative" href="{{ url_for('products.cart') }}">
                             <i data-feather="shopping-cart"></i>
                             Cart
-                            {% if session.cart %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ session.cart.values() | sum }}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge" style="display: {{ 'inline' if session.cart else 'none' }};">
+                                {{ session.cart.values() | sum if session.cart else '' }}
                             </span>
-                            {% endif %}
                         </a>
                     </li>
                     

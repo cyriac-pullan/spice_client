@@ -110,7 +110,11 @@
 
     // Remove item from cart
     function removeFromCart(button) {
-        const cartItem = button.closest('.card, tr');
+        // Use data-product-id for precise targeting
+        let cartItem = button.closest('[data-product-id]');
+        if (!cartItem) {
+            cartItem = button.closest('.card, tr');
+        }
         const productName = cartItem.querySelector('.card-title, td strong')?.textContent || 'Item';
         
         DelispUtils.confirmAction(`Remove ${productName} from cart?`, function() {
@@ -126,6 +130,12 @@
                 if (response.ok) {
                     // Remove item from DOM
                     if (cartItem) {
+                        // Try to get quantity before removal
+                        let qty = 1;
+                        const quantityElement = cartItem.querySelector('select[name="quantity"], .quantity-input');
+                        if (quantityElement) {
+                            qty = parseInt(quantityElement.value) || 1;
+                        }
                         cartItem.style.transition = 'opacity 0.3s ease-out';
                         cartItem.style.opacity = '0';
                         setTimeout(() => {
@@ -133,8 +143,11 @@
                             updateCartTotals();
                             checkEmptyCart();
                         }, 300);
+                        // Decrement sessionCartCount for instant badge update
+                        if (window.sessionCartCount !== undefined) {
+                            window.sessionCartCount = Math.max(0, window.sessionCartCount - qty);
+                        }
                     }
-                    
                     DelispUtils.showToast(`${productName} removed from cart`, 'info');
                     updateCartBadge();
                 } else {
@@ -333,21 +346,25 @@
         const cartBadge = document.querySelector('.navbar .badge');
         if (!cartBadge) return;
 
-        // Count items in current page (fallback)
-        const cartItems = document.querySelectorAll('.cart-item, .card[data-product-id]');
+        // Always use backend session cart count if available
         let itemCount = 0;
-        
-        cartItems.forEach(item => {
-            const quantityElement = item.querySelector('select[name="quantity"], .quantity-input');
-            if (quantityElement) {
-                itemCount += parseInt(quantityElement.value) || 0;
+        try {
+            // Try to get count from a JS variable injected by backend (set in base.html)
+            if (window.sessionCartCount !== undefined) {
+                itemCount = window.sessionCartCount;
+            } else {
+                // Fallback: try to parse from badge text (on first load)
+                itemCount = parseInt(cartBadge.textContent) || 0;
             }
-        });
-        
+        } catch (e) {
+            itemCount = 0;
+        }
+
         if (itemCount > 0) {
             cartBadge.textContent = itemCount;
             cartBadge.style.display = 'inline';
         } else {
+            cartBadge.textContent = '';
             cartBadge.style.display = 'none';
         }
     }
