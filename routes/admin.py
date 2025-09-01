@@ -4,7 +4,7 @@ from functools import wraps
 from models import Product, Category, Order, User
 from forms import ProductForm, CategoryForm
 from sqlalchemy import func
-from app import db
+from extensions import db
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -158,3 +158,10 @@ def orders():
 def customers():
     customers = User.query.filter_by(role='user').all()
     return render_template('admin/customers.html', customers=customers)
+
+@admin_bp.route('/orders/<int:order_id>')
+@login_required
+@admin_required
+def order_detail(order_id):
+    order = Order.query.get_or_404(order_id)
+    return render_template('admin/order_detail.html', order=order)

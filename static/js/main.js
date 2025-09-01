@@ -84,15 +84,24 @@
             });
         });
 
-        // Password strength indicator
-        const passwordInputs = document.querySelectorAll('input[type="password"]');
-        passwordInputs.forEach(input => {
-            if (input.name === 'password' || input.name === 'new_password') {
-                input.addEventListener('input', function() {
-                    showPasswordStrength(this);
-                });
-            }
-        });
+        // Password strength indicator only on registration and change password forms
+        const formsWithStrength = [
+            '/register',
+            '/profile/change-password',
+            '/reset-password',
+            '/user/change-password'
+        ];
+        const currentPath = window.location.pathname;
+        if (formsWithStrength.some(path => currentPath.includes(path))) {
+            const passwordInputs = document.querySelectorAll('input[type="password"]');
+            passwordInputs.forEach(input => {
+                if (input.name === 'password' || input.name === 'new_password') {
+                    input.addEventListener('input', function() {
+                        showPasswordStrength(this);
+                    });
+                }
+            });
+        }
     }
 
     // Validate individual form input

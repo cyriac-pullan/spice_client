@@ -1,9 +1,9 @@
 :root {
     --primary-color: #e67e22;
     --secondary-color: #d35400;
-    --dark-color: #333;
+    --dark-color: #222;
     --light-color: #f9f9f9;
-    --text-color: #555;
+    --text-color: #222;
     --white: #fff;
     --sidebar-width: 250px;
 }
@@ -94,7 +94,7 @@ body {
 }
 
 .header h1 {
-    color: var(--dark-color);
+    color: var(--primary-color);
     font-size: 2rem;
 }
 
@@ -131,6 +131,7 @@ body {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden;
+    color: var(--dark-color);
 }
 
 .dashboard-card::before {
@@ -152,9 +153,9 @@ body {
 
 .card-title {
     font-size: 0.9rem;
-    color: var(--text-color);
+    color: var(--primary-color);
     text-transform: uppercase;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .card-icon {
@@ -172,7 +173,7 @@ body {
 .card-value {
     font-size: 2.5rem;
     font-weight: bold;
-    color: var(--dark-color);
+    color: var(--secondary-color);
     margin-bottom: 10px;
 }
 
@@ -262,8 +263,8 @@ body {
 
 .table-title {
     font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--dark-color);
+    font-weight: 700;
+    color: var(--primary-color);
 }
 
 .data-table {
@@ -276,6 +277,8 @@ body {
     padding: 15px;
     text-align: left;
     border-bottom: 1px solid #eee;
+    color: var(--dark-color);
+    font-size: 1rem;
 }
 
 .data-table th {
@@ -294,17 +297,18 @@ body {
 .status-badge {
     padding: 5px 10px;
     border-radius: 15px;
-    font-size: 0.8em;
+    font-size: 0.9em;
+    font-weight: 600;
 }
 
 .status-active {
     background-color: #e1f7e1;
-    color: #27ae60;
+    color: #218838;
 }
 
 .status-inactive {
     background-color: #fde2e2;
-    color: #e74c3c;
+    color: #c82333;
 }
 
 /* Buttons */
@@ -371,8 +375,8 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    font-weight: 600;
-    color: var(--dark-color);
+    font-weight: 700;
+    color: var(--primary-color);
 }
 
 .form-control {
