@@ -15,7 +15,15 @@
                     <div class="row align-items-center">
                         <div class="col-md-2">
                             <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 80px; width: 80px;">
-                                <i data-feather="image" size="24" class="text-muted"></i>
+                                {% if item.product.image %}
+                                    {% if item.product.image.startswith('http') %}
+                                        <img src="{{ item.product.image }}" alt="{{ item.product.name }}" style="max-height: 70px; max-width: 100%; object-fit: contain;">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename=item.product.image.lstrip('/')) }}" alt="{{ item.product.name }}" style="max-height: 70px; max-width: 100%; object-fit: contain;">
+                                    {% endif %}
+                                {% else %}
+                                    <i data-feather="image" size="24" class="text-muted"></i>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-4">

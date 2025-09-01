@@ -118,49 +118,38 @@ def checkout():
     form.billing_address.choices = [(a.id, f"{a.first_name} {a.last_name}, {a.address_line1}, {a.city}") for a in user_addresses]
     
     if form.validate_on_submit():
+        # Only allow Cash on Delivery
+        if form.payment_method.data != 'cod':
+            flash('Only Cash on Delivery is available at this time.', 'error')
+            return redirect(url_for('main.checkout'))
+
         total = sum(item['subtotal'] for item in cart_items)
-        
         # Get selected addresses
-        shipping_addr = next(a for a in user_addresses if a.id == form.shipping_address.data)
-        billing_addr = next(a for a in user_addresses if a.id == form.billing_address.data)
-        
-        # Create order
+        shipping_addr_id = int(form.shipping_address.data)
+        billing_addr_id = int(form.billing_address.data)
+        shipping_addr = next(a for a in user_addresses if a.id == shipping_addr_id)
+        billing_addr = next(a for a in user_addresses if a.id == billing_addr_id)
+
+        # Create order with payment method and status
         order = Order.create_order(
             user_id=current_user.id,
             items=[{
-                'product': item['product'].id,
+                'product_id': item['product'].id,
                 'name': item['product'].name,
                 'price': item['product'].price,
                 'quantity': item['quantity'],
                 'subtotal': item['subtotal']
             } for item in cart_items],
-            shipping_address={
-                'firstName': shipping_addr.first_name,
-                'lastName': shipping_addr.last_name,
-                'addressLine1': shipping_addr.address_line1,
-                'addressLine2': shipping_addr.address_line2,
-                'city': shipping_addr.city,
-                'state': shipping_addr.state,
-                'postalCode': shipping_addr.postal_code,
-                'country': shipping_addr.country
-            },
-            billing_address={
-                'firstName': billing_addr.first_name,
-                'lastName': billing_addr.last_name,
-                'addressLine1': billing_addr.address_line1,
-                'addressLine2': billing_addr.address_line2,
-                'city': billing_addr.city,
-                'state': billing_addr.state,
-                'postalCode': billing_addr.postal_code,
-                'country': billing_addr.country
-            },
-            total_amount=total
+            shipping_address_id=shipping_addr.id,
+            billing_address_id=billing_addr.id,
+            total_amount=total,
+            payment_method='Cash on Delivery',
+            payment_status='pending',
+            status='pending'
         )
-        
-        # Clear cart
+
         clear_cart()
-        
-        flash('Order placed successfully!', 'success')
+        flash('Order placed successfully! You will pay upon delivery.', 'success')
         return redirect(url_for('main.orders'))
     
     total = sum(item['subtotal'] for item in cart_items)

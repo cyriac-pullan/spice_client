@@ -189,16 +189,20 @@ class Order(db.Model):
     billing_address = db.relationship('Address', foreign_keys=[billing_address_id])
 
     @staticmethod
-    def create_order(user_id, items, shipping_address_id, billing_address_id, total_amount):
+    def create_order(user_id, items, shipping_address_id, billing_address_id, total_amount, payment_method, payment_status, status):
         order = Order(
             user_id=user_id,
             total_amount=total_amount,
             shipping_address_id=shipping_address_id,
-            billing_address_id=billing_address_id
+            billing_address_id=billing_address_id,
+            payment_status=payment_status,
+            status=status
         )
+        # Store payment method as a string in a new column if not present, or as a note (for now, as attribute)
+        order.payment_method = payment_method
         db.session.add(order)
         db.session.flush()  # Get the order ID
-        
+
         # Add order items
         for item in items:
             order_item = OrderItem(
@@ -208,7 +212,7 @@ class Order(db.Model):
                 price=item['price']
             )
             db.session.add(order_item)
-        
+
         db.session.commit()
         return order
 
@@ -374,7 +378,7 @@ def create_sample_data():
         Product.create_product(**product_data)
     
     print("Sample data created successfully!")
-    
+
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
     id = db.Column(db.Integer, primary_key=True)

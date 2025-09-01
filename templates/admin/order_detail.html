@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Order Detail - Deli Spi Admin</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+	<div class="admin-container">
+		<nav class="sidebar">
+			<div class="sidebar-header">
+				<h2>Deli Spi Admin</h2>
+			</div>
+			<ul class="sidebar-menu">
+				<li><a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+				<li><a href="{{ url_for('admin.products') }}"><i class="fas fa-box"></i> <span>Products</span></a></li>
+				<li><a href="{{ url_for('admin.orders') }}" class="active"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
+				<li><a href="{{ url_for('admin.customers') }}"><i class="fas fa-users"></i> <span>Customers</span></a></li>
+				<li><a href="{{ url_for('main.index') }}"><i class="fas fa-external-link-alt"></i> <span>View Site</span></a></li>
+				<li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+			</ul>
+		</nav>
+		<main class="main-content">
+			<div class="header">
+				<h1>Order Detail</h1>
+				<a href="{{ url_for('admin.orders') }}" class="btn btn-outline-secondary">Back to Orders</a>
+			</div>
+			<div class="order-detail-container">
+				<h2>Order #{{ order.id }}</h2>
+				<p><strong>Date:</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+				<p><strong>Customer:</strong> {{ order.user.first_name }} {{ order.user.last_name }} (ID: {{ order.user.id }})</p>
+				<p><strong>Status:</strong> <span class="status-badge status-{{ order.status }}">{{ order.status.title() }}</span></p>
+				<p><strong>Payment Method:</strong> {{ order.payment_method if order.payment_method else 'Cash on Delivery' }}</p>
+				<p><strong>Payment Status:</strong> {{ order.payment_status.title() }}</p>
+				<h3>Shipping Address</h3>
+				<p>{{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}<br>
+				{{ order.shipping_address.address_line1 }}<br>
+				{% if order.shipping_address.address_line2 %}{{ order.shipping_address.address_line2 }}<br>{% endif %}
+				{{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.postal_code }}<br>
+				{{ order.shipping_address.country }}</p>
+				<h3>Order Items</h3>
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th>Product</th>
+							<th>Quantity</th>
+							<th>Price</th>
+							<th>Subtotal</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in order.items %}
+						<tr>
+							<td>{{ item.product.name }}</td>
+							<td>{{ item.quantity }}</td>
+							<td>${{ '%.2f'|format(item.price) }}</td>
+							<td>${{ '%.2f'|format(item.price * item.quantity) }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				<h3>Total: ${{ '%.2f'|format(order.total_amount) }}</h3>
+			</div>
+		</main>
+	</div>
+</body>
+</html>

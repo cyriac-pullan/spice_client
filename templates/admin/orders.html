@@ -47,6 +47,7 @@
                             <th>Date</th>
                             <th>Items</th>
                             <th>Total</th>
+                            <th>Payment</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -54,14 +55,15 @@
                     <tbody>
                         {% for order in orders %}
                         <tr>
-                            <td><code>{{ order.id[:8] }}</code></td>
+                            <td><code>{{ order.id }}</code></td>
                             <td>
-                                Customer #{{ order.user }}<br>
-                                <small class="text-muted">{{ order.shipping_address.firstName }} {{ order.shipping_address.lastName }}</small>
+                                {{ order.user.first_name }} {{ order.user.last_name }}<br>
+                                <small class="text-muted">ID: {{ order.user.id }}</small>
                             </td>
                             <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                             <td>{{ order.items|length }} items</td>
                             <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                            <td>{{ order.payment_method if order.payment_method else 'Cash on Delivery' }}</td>
                             <td>
                                 <span class="status-badge status-{{ order.status }}">
                                     {{ order.status.title() }}
