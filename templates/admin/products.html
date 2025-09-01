@@ -57,7 +57,11 @@
                         <tr>
                             <td>
                                 {% if product.image %}
-                                    <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image">
+                                    {% if product.image.startswith('http') %}
+                                        <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename=product.image.lstrip('/')) }}" alt="{{ product.name }}" class="product-image">
+                                    {% endif %}
                                 {% else %}
                                     <div class="product-image" style="background-color: #f0f0f0; display: flex; align-items: center; justify-content: center;">
                                         <i class="fas fa-image" style="color: #ccc;"></i>

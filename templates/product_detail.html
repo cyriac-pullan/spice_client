@@ -16,7 +16,15 @@
         <div class="col-lg-6">
             <div class="card">
                 <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary" style="height: 400px;">
-                    <i data-feather="image" size="120" class="text-muted"></i>
+                    {% if product.image %}
+                        {% if product.image.startswith('http') %}
+                            <img src="{{ product.image }}" alt="{{ product.name }}" style="max-height: 380px; max-width: 100%; object-fit: contain;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename=product.image.lstrip('/')) }}" alt="{{ product.name }}" style="max-height: 380px; max-width: 100%; object-fit: contain;">
+                        {% endif %}
+                    {% else %}
+                        <i data-feather="image" size="120" class="text-muted"></i>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -98,7 +106,15 @@
             <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card h-100 border-0 shadow-sm">
                     <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary" style="height: 150px;">
-                        <i data-feather="image" size="32" class="text-muted"></i>
+                        {% if related_product.image %}
+                            {% if related_product.image.startswith('http') %}
+                                <img src="{{ related_product.image }}" alt="{{ related_product.name }}" style="max-height: 140px; max-width: 100%; object-fit: contain;">
+                            {% else %}
+                                <img src="{{ url_for('static', filename=related_product.image.lstrip('/')) }}" alt="{{ related_product.name }}" style="max-height: 140px; max-width: 100%; object-fit: contain;">
+                            {% endif %}
+                        {% else %}
+                            <i data-feather="image" size="32" class="text-muted"></i>
+                        {% endif %}
                     </div>
                     <div class="card-body">
                         <h6 class="card-title">{{ related_product.name }}</h6>
