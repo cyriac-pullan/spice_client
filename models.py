@@ -190,6 +190,7 @@ class Order(db.Model):
 
     @staticmethod
     def create_order(user_id, items, shipping_address_id, billing_address_id, total_amount, payment_method, payment_status, status):
+        print(f"[DEBUG] create_order called for user {user_id} with {len(items)} items.")
         order = Order(
             user_id=user_id,
             total_amount=total_amount,
@@ -202,8 +203,9 @@ class Order(db.Model):
         order.payment_method = payment_method
         db.session.add(order)
         db.session.flush()  # Get the order ID
+        print(f"[DEBUG] Order created with ID {order.id}")
 
-        # Add order items
+        # Add order items and reduce stock
         for item in items:
             order_item = OrderItem(
                 order_id=order.id,
@@ -212,6 +214,13 @@ class Order(db.Model):
                 price=item['price']
             )
             db.session.add(order_item)
+            # Reduce stock
+            product = Product.query.get(item['product_id'])
+            if product:
+                old_stock = product.stock_quantity
+                product.stock_quantity = max(0, product.stock_quantity - item['quantity'])
+                db.session.add(product)
+                print(f"[DEBUG] Reduced stock for product {product.id}: {old_stock} -> {product.stock_quantity}")
 
         db.session.commit()
         return order
