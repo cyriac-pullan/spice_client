@@ -70,7 +70,7 @@
                             </td>
                             <td>{{ product.name }}</td>
                             <td>{{ product.category.name }}</td>
-                            <td>${{ "%.2f"|format(product.price) }}</td>
+                            <td>₹{{ "%.2f"|format(product.price) }}</td>
                             <td>{{ product.stock_quantity }}</td>
                             <td>
                                 <span class="status-badge status-{{ product.status }}">
@@ -84,6 +84,11 @@
                                 <button class="action-btn delete-btn" onclick="deleteProduct({{ product.id }})">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                {% if product.status == 'inactive' %}
+                                <button class="action-btn reactivate-btn" onclick="reactivateProduct({{ product.id }})" style="background-color: #28a745; color: white;">
+                                    <i class="fas fa-undo"></i> Reactivate
+                                </button>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -165,6 +170,25 @@
                         location.reload();
                     } else {
                         alert('Error deleting product');
+                    }
+                });
+            }
+        }
+
+        function reactivateProduct(productId) {
+            if (confirm('Are you sure you want to reactivate this product?')) {
+                fetch(`/admin/products/${productId}/reactivate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error reactivating product');
                     }
                 });
             }

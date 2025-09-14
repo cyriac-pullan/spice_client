@@ -191,11 +191,13 @@
                         cartBadge.textContent = data.count;
                         cartBadge.style.display = 'inline';
                     } else {
+                        cartBadge.textContent = '';
                         cartBadge.style.display = 'none';
                     }
                 })
                 .catch(error => {
-                    console.log('Cart count update failed:', error);
+                    cartBadge.textContent = '';
+                    cartBadge.style.display = 'none';
                 });
         }
     }

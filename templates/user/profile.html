@@ -104,10 +104,10 @@
                                 <tbody>
                                     {% for order in orders %}
                                     <tr>
-                                        <td><code>{{ order.id[:8] }}</code></td>
+                                        <td><code>{{ order.id }}</code></td>
                                         <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
                                         <td>{{ order.items|length }} items</td>
-                                        <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                                        <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
                                         <td>
                                             <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'completed' %}success{% else %}secondary{% endif %}">
                                                 {{ order.status.title() }}

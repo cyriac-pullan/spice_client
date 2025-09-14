@@ -29,10 +29,10 @@
                             <div>
                                 <strong>{{ item.product.name }}</strong>
                                 <br>
-                                <small class="text-muted">Quantity: {{ item.quantity }} × ${{ "%.2f"|format(item.price) }}</small>
+                                <small class="text-muted">Quantity: {{ item.quantity }} × ₹{{ "%.2f"|format(item.price) }}</small>
                             </div>
                             <div class="text-end">
-                                <span class="fw-bold">${{ "%.2f"|format(item.price * item.quantity) }}</span>
+                                <span class="fw-bold">₹{{ "%.2f"|format(item.price * item.quantity) }}</span>
                             </div>
                         </div>
                         {% endfor %}
@@ -41,7 +41,7 @@
                         <h6>Order Summary:</h6>
                         <div class="d-flex justify-content-between">
                             <span>Total:</span>
-                            <strong>${{ "%.2f"|format(order.total_amount) }}</strong>
+                            <strong>₹{{ "%.2f"|format(order.total_amount) }}</strong>
                         </div>
                         
                         <hr>

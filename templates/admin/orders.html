@@ -62,7 +62,7 @@
                             </td>
                             <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                             <td>{{ order.items|length }} items</td>
-                            <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                            <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
                             <td>{{ order.payment_method if order.payment_method else 'Cash on Delivery' }}</td>
                             <td>
                                 <span class="status-badge status-{{ order.status }}">

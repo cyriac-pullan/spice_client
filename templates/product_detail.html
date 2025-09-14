@@ -36,7 +36,7 @@
                     <h1 class="card-title mb-3">{{ product.name }}</h1>
                     <p class="lead text-muted mb-4">{{ product.description }}</p>
                     <div class="mb-4">
-                        <span class="h2 text-primary">${{ "%.2f"|format(product.price) }}</span>
+                        <span class="h2 text-primary">₹{{ "%.2f"|format(product.price) }}</span>
                         <span class="ms-3">
                             {% if product.stock_quantity > 0 %}
                             <span class="badge bg-success fs-6">In Stock ({{ product.stock_quantity }})</span>
@@ -54,11 +54,18 @@
                         <div class="row g-3 align-items-end">
                             <div class="col-auto">
                                 <label for="quantity" class="form-label">Quantity</label>
-                                <select class="form-select" id="quantity" name="quantity" style="width: 80px;">
-                                    {% for i in range(1, [product.stock_quantity + 1, 11] | min) %}
-                                    <option value="{{ i }}">{{ i }}</option>
-                                    {% endfor %}
-                                </select>
+                                <div class="input-group">
+                                    <input type="number"
+                                           id="quantity"
+                                           name="quantity"
+                                           min="100"
+                                           max="{{ product.stock_quantity }}"
+                                           step="50"
+                                           value="100"
+                                           class="form-control text-center" />
+                                    <span class="input-group-text">g</span>
+                                </div>
+                                <small class="text-muted">100g – 10 kg</small>
                             </div>
                             <div class="col-auto">
                                 <button type="submit" class="btn btn-primary btn-lg">
@@ -120,7 +127,7 @@
                         <h6 class="card-title">{{ related_product.name }}</h6>
                         <p class="card-text text-muted small">{{ related_product.description[:50] }}...</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-primary">${{ "%.2f"|format(related_product.price) }}</span>
+                            <span class="fw-bold text-primary">₹{{ "%.2f"|format(related_product.price) }}</span>
                             <a href="{{ url_for('products.product_detail', product_id=related_product.id) }}" class="btn btn-sm btn-outline-primary">View</a>
                         </div>
                     </div>

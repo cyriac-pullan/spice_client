@@ -83,9 +83,9 @@ def clear_cart():
         session.pop('cart', None)
 
 def get_cart_count():
-    """Get total number of items in cart"""
+    """Get number of distinct products in cart"""
     if current_user.is_authenticated:
-        return sum(item.quantity for item in CartItem.query.filter_by(user_id=current_user.id).all())
+        return CartItem.query.filter_by(user_id=current_user.id).count()
     else:
         cart = session.get('cart', {})
-        return sum(cart.values())
+        return len(cart)

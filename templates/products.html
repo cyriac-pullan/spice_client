@@ -65,7 +65,7 @@
                             <h5 class="card-title">{{ product.name }}</h5>
                             <p class="card-text text-muted">{{ product.description[:80] }}...</p>
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="h5 text-primary mb-0">${{ "%.2f"|format(product.price) }}</span>
+                                <span class="h5 text-primary mb-0">₹{{ "%.2f"|format(product.price) }}</span>
                                 {% if product.stock_quantity > 0 %}
                                 <span class="badge bg-success">In Stock ({{ product.stock_quantity }})</span>
                                 {% else %}
@@ -78,10 +78,20 @@
                             <div class="d-grid gap-2">
                                 <a href="{{ url_for('products.product_detail', product_id=product.id) }}" class="btn btn-primary">View Details</a>
                                 {% if product.stock_quantity > 0 %}
-                                <form method="POST" action="{{ url_for('products.add_to_cart_route') }}" class="d-inline">
+                                <form method="POST" action="{{ url_for('products.add_to_cart_route') }}" class="d-inline add-to-cart-form">
                                     <input type="hidden" name="product_id" value="{{ product.id }}">
-                                    <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" class="btn btn-outline-primary w-100">
+                                    <div class="input-group mb-2">
+                                        <input type="number"
+                                               name="quantity"
+                                               min="100"
+                                               max="{{ product.stock_quantity }}"
+                                               step="50"
+                                               value="100"
+                                               class="form-control text-center" />
+                                        <span class="input-group-text">g</span>
+                                    </div>
+                                    <small class="text-muted">100g – 10 kg</small>
+                                    <button type="submit" class="btn btn-outline-primary w-100 mt-2">
                                         <i data-feather="shopping-cart" size="16"></i> Add to Cart
                                     </button>
                                 </form>
@@ -103,4 +113,60 @@
         </div>
     </div>
 </div>
+
+<style>
+.quantity-input {
+    max-width: 150px;
+}
+.quantity-input input {
+    border-left: 0;
+    border-right: 0;
+}
+.quantity-input .btn {
+    width: 35px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.quantity-input').forEach(function(wrapper) {
+        const input = wrapper.querySelector('input');
+        const btnMinus = wrapper.querySelector('.minus-btn');
+        const btnPlus = wrapper.querySelector('.plus-btn');
+        btnMinus.addEventListener('click', () => {
+            let value = parseInt(input.value);
+            let min = parseInt(input.min);
+            if (value > min) {
+                input.value = value - parseInt(input.step);
+            }
+        });
+        btnPlus.addEventListener('click', () => {
+            let value = parseInt(input.value);
+            let max = parseInt(input.max);
+            if (value < max) {
+                input.value = value + parseInt(input.step);
+            }
+        });
+    });
+    
+    document.querySelectorAll('.add-to-cart-form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart badge
+                    const badge = document.querySelector('.navbar .badge');
+                    badge.textContent = data.cart_count;
+                }
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

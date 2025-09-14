@@ -345,28 +345,22 @@
     function updateCartBadge() {
         const cartBadge = document.querySelector('.navbar .badge');
         if (!cartBadge) return;
-
-        // Always use backend session cart count if available
-        let itemCount = 0;
-        try {
-            // Try to get count from a JS variable injected by backend (set in base.html)
-            if (window.sessionCartCount !== undefined) {
-                itemCount = window.sessionCartCount;
-            } else {
-                // Fallback: try to parse from badge text (on first load)
-                itemCount = parseInt(cartBadge.textContent) || 0;
-            }
-        } catch (e) {
-            itemCount = 0;
-        }
-
-        if (itemCount > 0) {
-            cartBadge.textContent = itemCount;
-            cartBadge.style.display = 'inline';
-        } else {
-            cartBadge.textContent = '';
-            cartBadge.style.display = 'none';
-        }
+        // Always fetch latest count from backend
+        fetch('/products/cart-count')
+            .then(response => response.json())
+            .then(data => {
+                if (data.count > 0) {
+                    cartBadge.textContent = data.count;
+                    cartBadge.style.display = 'inline';
+                } else {
+                    cartBadge.textContent = '';
+                    cartBadge.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                cartBadge.textContent = '';
+                cartBadge.style.display = 'none';
+            });
     }
 
     // Initialize cart storage (for persistence across page loads)

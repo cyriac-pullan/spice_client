@@ -1,0 +1,18 @@
+body {
+    background-color: #ffffff;
+    color: #2e7d32;
+}
+
+.navbar, .footer {
+    background-color: #a5d6a7;
+}
+
+.btn-primary {
+    background-color: #2e7d32;
+    border-color: #2e7d32;
+}
+
+.btn-primary:hover {
+    background-color: #1b5e20;
+    border-color: #1b5e20;
+}

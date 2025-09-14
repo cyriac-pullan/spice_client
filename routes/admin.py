@@ -121,6 +121,27 @@ def delete_product(product_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@admin_bp.route('/products/<int:product_id>/reactivate', methods=['POST'])
+@login_required
+@admin_required
+def reactivate_product(product_id):
+    try:
+        product = Product.query.get(product_id)
+        if not product:
+            return jsonify({'success': False, 'error': 'Product not found'})
+        
+        if product.status == 'inactive':
+            product.status = 'active'
+            db.session.commit()
+            flash('Product reactivated successfully!', 'success')
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Product is already active'})
+            
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
+
 @admin_bp.route('/categories')
 @login_required
 @admin_required
@@ -155,6 +176,9 @@ def orders():
 @admin_bp.route('/customers')
 @login_required
 @admin_required
+def customers():
+    # TODO: Implement customers view
+    return render_template('admin/customers.html')
 def customers():
     customers = User.query.filter_by(role='user').all()
     return render_template('admin/customers.html', customers=customers)

@@ -65,9 +65,12 @@ def add_to_cart_route():
         return redirect(url_for('products.product_detail', product_id=product_id))
     
     add_to_cart(str(product_id_int), quantity)
-    flash(f'{product.name} added to cart!', 'success')
-    
-    return redirect(url_for('products.product_detail', product_id=product_id))
+    cart_count = len(session.get('cart', {}))
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'success': True, 'cart_count': cart_count})
+    else:
+        flash(f'{product.name} added to cart!', 'success')
+        return redirect(url_for('products.product_detail', product_id=product_id))
 
 @products_bp.route('/cart')
 def cart():

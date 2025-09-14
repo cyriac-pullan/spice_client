@@ -1,22 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="bg-primary text-white py-5">
+<!-- Hero Section with Animation -->
+<section class="bg-white py-5 hero-section" style="border-bottom: 2px solid #198754; overflow: hidden;">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-3">Premium Spices & Herbs</h1>
-                <p class="lead mb-4">Discover authentic flavors from around the world. Quality ingredients for exceptional culinary experiences.</p>
-                <a href="{{ url_for('products.products') }}" class="btn btn-light btn-lg">Shop Now</a>
+                <h1 class="display-4 fw-bold mb-3 text-success animate-fade-in">Premium Spices & Herbs</h1>
+                <p class="lead mb-4 text-dark animate-fade-in" style="animation-delay: 0.2s;">Discover authentic flavors from around the world. Quality ingredients for exceptional culinary experiences.</p>
+                <a href="{{ url_for('products.products') }}" class="btn btn-success btn-lg animate-fade-in" style="animation-delay: 0.4s;">Shop Now</a>
             </div>
             <div class="col-lg-6 text-center">
-                <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="150" cy="100" r="80" fill="currentColor" opacity="0.2"/>
-                    <circle cx="150" cy="100" r="60" fill="currentColor" opacity="0.4"/>
-                    <circle cx="150" cy="100" r="40" fill="currentColor" opacity="0.6"/>
-                    <circle cx="150" cy="100" r="20" fill="currentColor"/>
-                </svg>
+                <img src="{{ url_for('static', filename='img/delipi-bag.jpg') }}" alt="Deli Spi Premium Spices" class="img-fluid rounded shadow floating-animation" style="max-width:320px;">
             </div>
         </div>
     </div>
@@ -25,13 +20,13 @@
 <!-- Categories Section -->
 <section class="py-5">
     <div class="container">
-        <h2 class="text-center mb-5">Shop by Category</h2>
+        <h2 class="text-center mb-5 section-title">Shop by Category</h2>
         <div class="row">
             {% for category in categories %}
             <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
+                <div class="card h-100 border-0 shadow-sm category-card">
                     <div class="card-body text-center">
-                        <div class="mb-3">
+                        <div class="mb-3 icon-wrapper">
                             <i data-feather="{% if 'spice' in category.name.lower() %}star{% elif 'herb' in category.name.lower() %}leaf{% else %}package{% endif %}" size="48" class="text-primary"></i>
                         </div>
                         <h5 class="card-title">{{ category.name }}</h5>
@@ -48,12 +43,12 @@
 <!-- Featured Products -->
 <section class="py-5 bg-light">
     <div class="container">
-        <h2 class="text-center mb-5">Featured Products</h2>
+        <h2 class="text-center mb-5 section-title">Featured Products</h2>
         <div class="row">
             {% for product in featured_products %}
             <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary" style="height: 200px;">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary product-image" style="height: 200px;">
                         {% if product.image %}
                             {% if product.image.startswith('http') %}
                                 <img src="{{ product.image }}" alt="{{ product.name }}" style="max-height: 180px; max-width: 100%; object-fit: contain;">
@@ -68,7 +63,7 @@
                         <h5 class="card-title">{{ product.name }}</h5>
                         <p class="card-text text-muted">{{ product.description[:50] }}...</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="h5 text-primary mb-0">${{ "%.2f"|format(product.price) }}</span>
+                            <span class="h5 text-primary mb-0">₹{{ "%.2f"|format(product.price) }}</span>
                             <span class="badge bg-success">In Stock</span>
                         </div>
                     </div>
@@ -80,7 +75,7 @@
             {% endfor %}
         </div>
         <div class="text-center mt-4">
-            <a href="{{ url_for('products.products') }}" class="btn btn-outline-primary btn-lg">View All Products</a>
+            <a href="{{ url_for('products.products') }}" class="btn btn-outline-primary btn-lg pulse-animation">View All Products</a>
         </div>
     </div>
 </section>
@@ -88,24 +83,24 @@
 <!-- Why Choose Us -->
 <section class="py-5">
     <div class="container">
-        <h2 class="text-center mb-5">Why Choose Deli Spi?</h2>
+        <h2 class="text-center mb-5 section-title">Why Choose Deli Spi?</h2>
         <div class="row">
             <div class="col-md-4 text-center mb-4">
-                <div class="mb-3">
+                <div class="mb-3 icon-hover">
                     <i data-feather="award" size="48" class="text-primary"></i>
                 </div>
                 <h4>Premium Quality</h4>
                 <p>We source only the finest spices and herbs from trusted suppliers worldwide.</p>
             </div>
             <div class="col-md-4 text-center mb-4">
-                <div class="mb-3">
+                <div class="mb-3 icon-hover">
                     <i data-feather="truck" size="48" class="text-primary"></i>
                 </div>
                 <h4>Fast Shipping</h4>
                 <p>Quick and reliable delivery to ensure your spices arrive fresh and ready to use.</p>
             </div>
             <div class="col-md-4 text-center mb-4">
-                <div class="mb-3">
+                <div class="mb-3 icon-hover">
                     <i data-feather="heart" size="48" class="text-primary"></i>
                 </div>
                 <h4>Customer Satisfaction</h4>
@@ -114,4 +109,149 @@
         </div>
     </div>
 </section>
+
+<style>
+    /* Animation Keyframes */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    /* Animation Classes */
+    .animate-fade-in {
+        animation: fadeIn 1s ease forwards;
+        opacity: 0;
+    }
+    
+    .floating-animation {
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    .pulse-animation:hover {
+        animation: pulse 1s infinite;
+    }
+    
+    /* Section Title Styling */
+    .section-title {
+        position: relative;
+        padding-bottom: 15px;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(to right, #198754, #20c997);
+        border-radius: 2px;
+    }
+    
+    /* Card Hover Effects */
+    .category-card, .product-card {
+        transition: all 0.3s ease;
+    }
+    
+    .category-card:hover, .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Icon Hover Effects */
+    .icon-hover {
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .icon-hover:hover {
+        transform: scale(1.2);
+    }
+    
+    /* Product Image Enhancement */
+    .product-image {
+        overflow: hidden;
+    }
+    
+    .product-image img {
+        transition: transform 0.5s ease;
+    }
+    
+    .product-card:hover .product-image img {
+        transform: scale(1.1);
+    }
+    
+    /* Hero Section Background Effect */
+    .hero-section {
+        position: relative;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(25, 135, 84, 0.05);
+        border-radius: 50%;
+        z-index: 0;
+    }
+    
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 200px;
+        height: 200px;
+        background: rgba(25, 135, 84, 0.05);
+        border-radius: 50%;
+        z-index: 0;
+    }
+</style>
+
+<script>
+    // Initialize animations when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Feather Icons
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+        
+        // Add scroll animations
+        const animatedElements = document.querySelectorAll('.category-card, .product-card, .icon-hover');
+        
+        // Create intersection observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        // Set initial state and observe elements
+        animatedElements.forEach(el => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(el);
+        });
+    });
+</script>
 {% endblock %}

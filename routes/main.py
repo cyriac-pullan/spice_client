@@ -100,6 +100,40 @@ def new_address():
     
     return render_template('user/address_form.html', form=form, title='New Address')
 
+@main_bp.route('/addresses/<int:address_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_address(address_id):
+    address = Address.query.filter_by(id=address_id, user_id=current_user.id).first_or_404()
+    form = AddressForm(obj=address)
+    if form.validate_on_submit():
+        address.first_name = form.first_name.data
+        address.last_name = form.last_name.data
+        address.address_line1 = form.address_line1.data
+        address.address_line2 = form.address_line2.data
+        address.city = form.city.data
+        address.state = form.state.data
+        address.postal_code = form.postal_code.data
+        address.country = form.country.data
+        address.is_default = form.is_default.data
+        Address.query.filter_by(user_id=current_user.id, is_default=True).update({'is_default': False}) if address.is_default else None
+        address.is_default = form.is_default.data
+        address.save() if hasattr(address, 'save') else None
+        from extensions import db
+        db.session.commit()
+        flash('Address updated successfully!', 'success')
+        return redirect(url_for('main.addresses'))
+    return render_template('user/address_form.html', form=form, title='Edit Address')
+
+@main_bp.route('/addresses/<int:address_id>/delete', methods=['POST'])
+@login_required
+def delete_address(address_id):
+    address = Address.query.filter_by(id=address_id, user_id=current_user.id).first_or_404()
+    from extensions import db
+    db.session.delete(address)
+    db.session.commit()
+    flash('Address deleted successfully!', 'success')
+    return redirect(url_for('main.addresses'))
+
 @main_bp.route('/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout():

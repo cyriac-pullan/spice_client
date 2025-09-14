@@ -55,13 +55,13 @@
 						<tr>
 							<td>{{ item.product.name }}</td>
 							<td>{{ item.quantity }}</td>
-							<td>${{ '%.2f'|format(item.price) }}</td>
-							<td>${{ '%.2f'|format(item.price * item.quantity) }}</td>
+							<td>₹{{ '%.2f'|format(item.price) }}</td>
+							<td>₹{{ '%.2f'|format(item.price * item.quantity) }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>
 				</table>
-				<h3>Total: ${{ '%.2f'|format(order.total_amount) }}</h3>
+				<h3>Total: ₹{{ '%.2f'|format(order.total_amount) }}</h3>
 			</div>
 		</main>
 	</div>

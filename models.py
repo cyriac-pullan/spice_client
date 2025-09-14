@@ -1,3 +1,19 @@
+# Bulk update script: Set all product stock to 10kg (10000g)
+
+
+
+def set_all_product_stock_to_10kg():
+    from extensions import db
+    from app import app
+    with app.app_context():
+        from models import Product
+        products = Product.query.all()
+        for product in products:
+            product.stock_quantity = 10000
+        db.session.commit()
+
+if __name__ == "__main__":
+    set_all_product_stock_to_10kg()
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
