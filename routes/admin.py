@@ -177,9 +177,6 @@ def orders():
 @login_required
 @admin_required
 def customers():
-    # TODO: Implement customers view
-    return render_template('admin/customers.html')
-def customers():
     customers = User.query.filter_by(role='user').all()
     return render_template('admin/customers.html', customers=customers)
 
